@@ -5,7 +5,9 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-
+const webRoutes = require("./routes/web");
+// const adminRoutes = require("./routes/admin");
+const apiRoutes = require("./routes/api");
 
 const app = express();
 const port = process.env.PORT || 1234;
@@ -49,15 +51,19 @@ app.use(function (req, res, next) {
 
 app.use(function (req, res, next) {
   const cart = req.session.cart;
-  const item = [];
+  const huyitem = [];
   if (cart) {
-    for (const key in cart.itemCart) {
-      item.push(cart.itemCart[key]);
+    for (const key in cart.huydev) {
+      huyitem.push(cart.huydev[key]);
     }
   }
-  res.locals.item = item;
+  res.locals.huyitem = huyitem;
   next();
 });
+
+app.use("/", webRoutes);
+// app.use("/admin", adminRoutes);
+app.use("/api", apiRoutes);
 
 
 app.use((req, res) => {
