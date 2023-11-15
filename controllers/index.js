@@ -15,27 +15,48 @@ exports.getIndex = async (req, res) => {
   }
 };
 
-
+exports.getDetail = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // get slug category
 
-
+exports.getProductOfCategory = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // post comment
 
-
+exports.postComment = async (req, res) => {
+  
+};
 
 // update comment
 
+exports.updateComment = (req, res, next) => {
+  
 
+  
+};
 
 // delete comment
 
-
+exports.deleteComment = (req, res) => {
+  
+};
 
 // add to cart
 
 exports.addToCart = (req, res) => {
+
   const slug = req.body.slugProduct;
   const quantity = Number(req.body.quantity || 1);
 
@@ -77,6 +98,8 @@ exports.addToCart = (req, res) => {
         message: "Thêm Sản Phẩm Thất Bại",
       });
     });
+  
+
 };
 
 exports.viewCart = async (req, res) => {
@@ -187,6 +210,7 @@ exports.deleteCart = (req, res) => {
 // show view session cart
 
 exports.getviewCheckOut = async (req, res) => {
+
   const categories = await Category.find({});
 
   const cart = req.session.cart;
@@ -225,10 +249,23 @@ exports.getviewCheckOut = async (req, res) => {
     .catch((err) => {
       console.log(err);
     });
+
 };
 
 // odder
-
+exports.orderCart = async (req, res) => {
+  
+};
 
 // list order
+exports.getListOrder = async (req, res) => {
+  
+};
 
+exports.getDetailOrder = async (req, res, next) => {
+  
+};
+
+exports.getStatusComplete = (req, res, next) => {
+  
+};

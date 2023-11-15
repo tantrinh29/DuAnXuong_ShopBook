@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const webRoutes = require("./routes/web");
-// const adminRoutes = require("./routes/admin");
+const adminRoutes = require("./routes/admin");
 const apiRoutes = require("./routes/api");
 
 const app = express();
@@ -62,7 +62,7 @@ app.use(function (req, res, next) {
 });
 
 app.use("/", webRoutes);
-// app.use("/admin", adminRoutes);
+app.use("/admin", adminRoutes);
 app.use("/api", apiRoutes);
 
 
