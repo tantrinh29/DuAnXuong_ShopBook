@@ -15,68 +15,48 @@ exports.getIndex = async (req, res) => {
   }
 };
 
-
+exports.getDetail = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // get slug category
 
-
+exports.getProductOfCategory = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // post comment
 
-
+exports.postComment = async (req, res) => {
+  
+};
 
 // update comment
 
+exports.updateComment = (req, res, next) => {
+  
 
+  
+};
 
 // delete comment
 
-
+exports.deleteComment = (req, res) => {
+  
+};
 
 // add to cart
 
 exports.addToCart = (req, res) => {
-  const slug = req.body.slugProduct;
-  const quantity = Number(req.body.quantity || 1);
-
-  Product.findOne({ slugProduct: slug })
-    .then((product) => {
-      if (!product) {
-        return res.status(400).json({ message: "Không tìm thấy sản phẩm" });
-      }
-
-      let cart = req.session.cart;
-      // Nếu giỏ hàng không tồn tại thì tạo mới
-      if (!cart) {
-        cart = { huydev: {}, totalQuantity: 0, totalPrice: 0 };
-      }
-      // +1 và đoạn này khó
-      if (cart.huydev[product._id]) {
-        cart.huydev[product._id].quantity += quantity;
-        cart.totalQuantity += quantity;
-        cart.totalPrice += Number(product.price) * quantity;
-      } else {
-        // Thêm mới sản phẩm vào giỏ hàng
-        cart.huydev[product._id] = {
-          item: product,
-          quantity: quantity,
-        };
-        cart.totalQuantity += quantity;
-        cart.totalPrice += Number(product.price) * quantity;
-      }
-      req.session.cart = cart;
-      return res.status(200).json({
-        status: true,
-        message: "Thêm Sản Phẩm Thành Công",
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({
-        status: false,
-        message: "Thêm Sản Phẩm Thất Bại",
-      });
-    });
+  
 };
 
 exports.viewCart = async (req, res) => {
@@ -187,48 +167,23 @@ exports.deleteCart = (req, res) => {
 // show view session cart
 
 exports.getviewCheckOut = async (req, res) => {
-  const categories = await Category.find({});
-
-  const cart = req.session.cart;
-  const email = req.session.email;
-
-  if (!cart) {
-    return res.render("checkout", {
-      products: [],
-      userOrder: {},
-      totalPrice: 0,
-      categories: categories,
-    });
-  }
-
-  User.findOne({ email: email })
-    .then((user) => {
-      const userOrder = {
-        fullname: user.fullname,
-        email: user.email,
-      };
-
-      const products = [];
-      if (cart && cart.huydev && Object.keys(cart.huydev).length !== 0) {
-        for (const key in cart.huydev) {
-          products.push(cart.huydev[key]);
-        }
-      }
-
-      res.render("checkout", {
-        categories: categories,
-        products: products,
-        totalPrice: cart.totalPrice,
-        userOrder: userOrder,
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  
 };
 
 // odder
-
+exports.orderCart = async (req, res) => {
+  
+};
 
 // list order
+exports.getListOrder = async (req, res) => {
+  
+};
 
+exports.getDetailOrder = async (req, res, next) => {
+  
+};
+
+exports.getStatusComplete = (req, res, next) => {
+  
+};
