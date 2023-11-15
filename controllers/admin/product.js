@@ -180,9 +180,9 @@ exports.deleteProduct = (req, res, next) => {
       if (post.deletedCount > 0) {
         res
           .status(200)
-          .json({ status: true, message: "Xóa Sản Phẩm Thành Công" });
+          .json({ status: true, message: "Xóa Sản Phẩm Thành Công!" });
       } else {
-        const error = new Error("Không tìm thấy sản phẩm này");
+        const error = new Error("Không tìm thấy sản phẩm này!");
         error.statusCode = 404;
         throw error;
       }
@@ -193,4 +193,5 @@ exports.deleteProduct = (req, res, next) => {
       }
       next(err);
     });
+    
 };
