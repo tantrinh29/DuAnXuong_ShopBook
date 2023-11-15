@@ -48,16 +48,16 @@ exports.addToCart = (req, res) => {
       let cart = req.session.cart;
       // Nếu giỏ hàng không tồn tại thì tạo mới
       if (!cart) {
-        cart = { huydev: {}, totalQuantity: 0, totalPrice: 0 };
+        cart = { item: {}, totalQuantity: 0, totalPrice: 0 };
       }
       // +1 và đoạn này khó
-      if (cart.huydev[product._id]) {
-        cart.huydev[product._id].quantity += quantity;
+      if (cart.item[product._id]) {
+        cart.item[product._id].quantity += quantity;
         cart.totalQuantity += quantity;
         cart.totalPrice += Number(product.price) * quantity;
       } else {
         // Thêm mới sản phẩm vào giỏ hàng
-        cart.huydev[product._id] = {
+        cart.item[product._id] = {
           item: product,
           quantity: quantity,
         };
@@ -93,8 +93,8 @@ exports.viewCart = async (req, res) => {
   }
 
   const products = [];
-  for (const key in cart.huydev) {
-    products.push(cart.huydev[key]);
+  for (const key in cart.item) {
+    products.push(cart.item[key]);
   }
 
   res.locals.products = products;
@@ -118,14 +118,14 @@ exports.updateCart = (req, res) => {
       message: "Không Có Sản Phẩm Nào Ở Đây Huy Nha",
     });
   } else {
-    const cartItems = Object.keys(carts.huydev);
+    const cartItems = Object.keys(carts.item);
     let totalQuantity = 0;
     let totalPrice = 0;
 
     // sản phẩm có id trùng với id được truyền vào
     for (let itemId of cartItems) {
-      const productToUpdate = carts.huydev[itemId];
-      console.log("Item : ", carts.huydev);
+      const productToUpdate = carts.item[itemId];
+      console.log("Item : ", carts.item);
       console.log("Item ID", itemId);
       if (itemId == idProduct) {
         productToUpdate.quantity = quantity;
@@ -160,15 +160,15 @@ exports.deleteCart = (req, res) => {
       message: "Không Có Sản Phẩm Nào Ở Đây Huy Nha",
     });
   } else {
-    const cartItems = Object.keys(carts.huydev);
+    const cartItems = Object.keys(carts.item);
 
     for (let itemId of cartItems) {
       if (itemId == deleteIDProduct) {
-        const productToDelete = carts.huydev[itemId];
+        const productToDelete = carts.item[itemId];
         carts.totalPrice -=
           productToDelete.item.price * productToDelete.quantity;
         carts.totalQuantity -= productToDelete.quantity;
-        delete carts.huydev[itemId];
+        delete carts.item[itemId];
 
         return res.status(200).json({
           status: true,
@@ -209,9 +209,9 @@ exports.getviewCheckOut = async (req, res) => {
       };
 
       const products = [];
-      if (cart && cart.huydev && Object.keys(cart.huydev).length !== 0) {
-        for (const key in cart.huydev) {
-          products.push(cart.huydev[key]);
+      if (cart && cart.item && Object.keys(cart.item).length !== 0) {
+        for (const key in cart.item) {
+          products.push(cart.item[key]);
         }
       }
 
