@@ -1,18 +1,4 @@
 const express = require("express");
-
-let router = express.Router();
-const indexController = require("../controllers/admin/index");
-
-// ====================== list orders  ====================== //
-
-router.get("/listOrder", indexController.getListOrder);
-router.get(
-  "/detailOrder/:codeOrder",
-  indexController.getDetailOrder
-);
-
-router.get("/updateOrder/:id",  indexController.updateOrder);
-
 const User = require("../models/user");
 let router = express.Router();
 const indexController = require("../controllers/admin/index");
@@ -113,4 +99,3 @@ router.get("/listComment", requireAdmin, commentController.listComment);
 router.get("/deleteComment/:cmtId", requireAdmin, commentController.deleteComment);
 
 module.exports = router;
-
