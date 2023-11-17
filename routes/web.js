@@ -49,6 +49,10 @@ router.get("/login", async (req, res, next) => {
 });
 router.post("/postCreateUser", userController.createUser);
 router.post("/postLoginUser", userController.loginUser);
+router.get("/resetpassword",async (req, res, next) => {
+  const categories = await Category.find({});
+  res.render("auth/resetpassword", { categories: categories});
+})
 router.get("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
