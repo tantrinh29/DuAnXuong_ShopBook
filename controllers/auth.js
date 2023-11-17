@@ -1,22 +1,57 @@
-// Import các module và model cần thiết
-const User = require("../models/user"); // Chắc chắn rằng đường dẫn đến model user là đúng
-const random = require("random-token"); // Sử dụng để tạo token ngẫu nhiên
-const bcrypt = require("bcrypt"); // Thư viện bcrypt để băm mật khẩu
+const User = require("../models/user");
+const random = require("random-token");
 
+exports.createUser = (req, res, next) => {
+  const { fullname, password, repassword, email } = req.body;
+  if (fullname == "" || password == "" || repassword == "" || email == "") {
+    res.status(200).json({ status: false, message: "Không Được Để Trống" });
+  } else {
+    if (password !== repassword) {
+      return res
+        .status(200)
+        .json({ status: false, message: "Mật khẩu nhập lại không khớp!" });
+    } else {
+      // Mã hóa mật khẩu
+      bcrypt.hash(password, 10, (err, hash) => {
+        if (err) {
+          return res.status(500).json({
+            status: false,
+            message: "Có lỗi xảy ra trong quá trình mã hóa mật khẩu",
+          });
+        }
+        var token = random(24);
+        const users = new User({
+          fullname,
+          password: hash,
+          email,
+          token: token,
+        });
+        users
+          .save()
+          .then((result) => {
+            res.status(201).json({
+              status: true,
+              message: "Đăng Ký Thành Công",
+            });
+          })
+          .catch((err) => {
+            if (!err.statusCode) {
+              err.statusCode = 500;
+            }
+            next(err);
+          });
+      });
+    }
+  }
+};
 
-
-// Hàm xử lý đăng nhập người dùng
 exports.loginUser = (req, res, next) => {
-  const { email, password } = req.body; // Lấy thông tin email và password từ request body
-
-  // Kiểm tra xem email hoặc password có trống không
+  const { email, password } = req.body;
   if (email == "" || password == "") {
     res.status(200).json({ status: false, message: "Không Được Để Trống" });
   } else {
-    // Tìm người dùng trong cơ sở dữ liệu dựa trên email
     User.findOne({ email: email })
       .then((user) => {
-        // Kiểm tra xem người dùng có tồn tại không
         if (!user) {
           return res.status(200).json({
             status: false,
@@ -24,28 +59,24 @@ exports.loginUser = (req, res, next) => {
           });
         }
 
-        // So sánh mật khẩu đã băm từ yêu cầu với mật khẩu đã băm trong cơ sở dữ liệu
-        bcrypt.compare(password, user.password, (err, result) => {
-          if (result) {
-            // Nếu mật khẩu khớp, đánh dấu người dùng đã đăng nhập và lưu thông tin email vào session
-            req.session.loggedin = true;
-            req.session.email = email;
-            res.locals.email = email; // Lưu thông tin email vào biến locals của response
-            console.log(res.locals.email);
-            return res.status(200).json({
-              status: true,
-              message: "Đăng nhập thành công",
-            });
-          } else {
-            // Nếu mật khẩu không khớp, trả về thông báo đăng nhập thất bại
-            return res
-              .status(200)
-              .json({ status: false, message: "Đăng nhập thất bại" });
-          }
-        });
+        if (password === user.password) {
+          req.session.loggedin = true;
+          req.session.email = email;
+
+          res.locals.email = email; 
+
+          console.log(res.locals.email);
+          return res.status(200).json({
+            status: true,
+            message: "Đăng nhập thành công",
+          });
+        } else {
+          return res
+            .status(200)
+            .json({ status: false, message: "Đăng nhập thất bại" });
+        }
       })
       .catch((err) => {
-        // Xử lý lỗi nếu có
         if (!err.statusCode) {
           err.statusCode = 500;
         }
@@ -53,4 +84,3 @@ exports.loginUser = (req, res, next) => {
       });
   }
 };
-
