@@ -39,3 +39,25 @@ exports.updateCategory = (req, res, next) => {
 exports.deleteCategory = (req, res, next) => {
   
 };
+exports.deleteCategory = (req, res, next) => {
+  const cateId = req.params.cateId;
+  Category.deleteOne({ _id: cateId })
+    .then((post) => {
+      if (post.deletedCount > 0) {
+        res
+          .status(200)
+          .json({ status: true, message: "Xóa Danh Mục Thành Công" });
+      } else {
+        const error = new Error("Không tìm thấy danh mục này");
+        error.statusCode = 404;
+        throw error;
+      }
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
