@@ -1,6 +1,6 @@
 <%- include('_layout/header.ejs') %>
     <%- include('_layout/nav.ejs') %>
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <div class="row mb-2">
             <div class="col-sm-6"></div>
             <!-- /.col -->
@@ -61,14 +61,14 @@
                       </button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <form action="/admin/updateUser/<%= listUsers[i]._id %>" method="POST">
+                                                                <form class="updateUserForm" data-user-id="<%= listUsers[i]._id %>">
                                                                     <div class="mb-3">
+                                                                        <input type="hidden" name="id" class="userId" value="<%= listUsers[i]._id %>">
                                                                         <label for="edittitle" class="form-label">LEVEL</label>
-                                                                        <select class="custom-select" name="level">
-                                  <option <%= listUsers[i].level === 'admin' ? 'selected' : '' %> value="admin">Admin</option>
-                                  <option <%= listUsers[i].level === 'member' ? 'selected' : '' %> value="member">Member</option>
-                                </select>
-
+                                                                        <select class="custom-select userLevel" name="level">
+                                                                            <option <%= listUsers[i].level === 'admin' ? 'selected' : '' %> value="admin">Admin</option>
+                                                                            <option <%= listUsers[i].level === 'member' ? 'selected' : '' %> value="member">Member</option>
+                                                                        </select>
                                                                     </div>
                                                                     <button type="submit" class="btn btn-primary">Update</button>
                                                                 </form>
@@ -92,8 +92,44 @@
             </div>
             <!-- /.col -->
         </div>
-        <!-- /.row  -->
+        <!-- /.row -->
         <script>
+            $(document).on('submit', '.updateUserForm', function(e) {
+                e.preventDefault();
+
+                // Lấy các giá trị từ form
+                var form = $(this);
+                var userID = form.find('.userId').val();
+                var userLevel = form.find('.userLevel').val();
+
+                // Gửi yêu cầu Ajax
+                $.ajax({
+                    type: "POST",
+                    dataType: "JSON",
+                    url: "/admin/updateUser/" + userID,
+                    data: {
+                        level: userLevel,
+                        id: userID
+                    },
+                    success: function(res) {
+                        $('#modal' + userID).modal('hide');
+                        Swal.fire({
+                            icon: "success",
+                            title: 'Thông Báo',
+                            text: res.message
+                        }).then((result) => {
+                            if (res.status === true) {
+                                $('#datatable1').load(location.href + " #datatable1");
+                            } else {
+                                // Xử lý tình huống khác nếu cần
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
             $(function() {
                 $("#datatable1").DataTable();
             });
