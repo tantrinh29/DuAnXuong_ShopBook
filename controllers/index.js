@@ -17,11 +17,23 @@ exports.getIndex = async (req, res) => {
 
 exports.getDetail = async (req, res) => {
     try {
-
+      const slug = req.params.slug;
+      const product = await Product.findOne({ slugProduct: slug });
+      const categories = await Category.find({});
+      const comments = await Comment.find({
+        slugProduct: slug, // Bình luận theo slug của sản phẩm
+      });
+      // console.log("Comments : ", comments);
+  
+      res.render("detail", {
+        detailProducts: product,
+        comments: comments,
+        categories: categories,
+      });
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-};
+  };
 
 // get slug category
 
@@ -279,9 +291,45 @@ exports.deleteCart = (req, res) => {
 // show view session cart
 
 exports.getviewCheckOut = async (req, res) => {
-
-    
-};
+    const categories = await Category.find({});
+  
+    const cart = req.session.cart;
+    const email = req.session.email;
+  
+    if (!cart) {
+      return res.render("checkout", {
+        products: [],
+        userOrder: {},
+        totalPrice: 0,
+        categories: categories,
+      });
+    }
+  
+    User.findOne({ email: email })
+      .then((user) => {
+        const userOrder = {
+          fullname: user.fullname,
+          email: user.email,
+        };
+  
+        const products = [];
+        if (cart && cart.huydev && Object.keys(cart.huydev).length !== 0) {
+          for (const key in cart.huydev) {
+            products.push(cart.huydev[key]);
+          }
+        }
+  
+        res.render("checkout", {
+          categories: categories,
+          products: products,
+          totalPrice: cart.totalPrice,
+          userOrder: userOrder,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
 // odder
 exports.orderCart = async (req, res) => {
