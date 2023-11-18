@@ -167,48 +167,7 @@ exports.deleteComment = (req, res) => {
 
 exports.addToCart = (req, res) => {
 
-    const slug = req.body.slugProduct;
-    const quantity = Number(req.body.quantity || 1);
-
-    Product.findOne({ slugProduct: slug })
-        .then((product) => {
-            if (!product) {
-                return res.status(400).json({ message: "Không tìm thấy sản phẩm" });
-            }
-
-            let cart = req.session.cart;
-            // Nếu giỏ hàng không tồn tại thì tạo mới
-            if (!cart) {
-                cart = { item: {}, totalQuantity: 0, totalPrice: 0 };
-            }
-            // +1 và đoạn này khó
-            if (cart.item[product._id]) {
-                cart.item[product._id].quantity += quantity;
-                cart.totalQuantity += quantity;
-                cart.totalPrice += Number(product.price) * quantity;
-            } else {
-                // Thêm mới sản phẩm vào giỏ hàng
-                cart.item[product._id] = {
-                    item: product,
-                    quantity: quantity,
-                };
-                cart.totalQuantity += quantity;
-                cart.totalPrice += Number(product.price) * quantity;
-            }
-            req.session.cart = cart;
-            return res.status(200).json({
-                status: true,
-                message: "Thêm Sản Phẩm Thành Công",
-            });
-        })
-        .catch((err) => {
-            console.log(err);
-            return res.status(500).json({
-                status: false,
-                message: "Thêm Sản Phẩm Thất Bại",
-            });
-        });
-
+    
 
 };
 
@@ -321,45 +280,7 @@ exports.deleteCart = (req, res) => {
 
 exports.getviewCheckOut = async (req, res) => {
 
-    const categories = await Category.find({});
-
-    const cart = req.session.cart;
-    const email = req.session.email;
-
-    if (!cart) {
-        return res.render("checkout", {
-            products: [],
-            userOrder: {},
-            totalPrice: 0,
-            categories: categories,
-        });
-    }
-
-    User.findOne({ email: email })
-        .then((user) => {
-            const userOrder = {
-                fullname: user.fullname,
-                email: user.email,
-            };
-
-            const products = [];
-            if (cart && cart.item && Object.keys(cart.item).length !== 0) {
-                for (const key in cart.item) {
-                    products.push(cart.item[key]);
-                }
-            }
-
-            res.render("checkout", {
-                categories: categories,
-                products: products,
-                totalPrice: cart.totalPrice,
-                userOrder: userOrder,
-            });
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-
+    
 };
 
 // odder
