@@ -332,11 +332,6 @@ exports.getviewCheckOut = async (req, res) => {
       });
   };
 
-
-    
-};
-
-
 // odder
 exports.orderCart = async (req, res) => {
 
