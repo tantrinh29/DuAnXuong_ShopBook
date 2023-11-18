@@ -3,7 +3,7 @@ const Product = require("../../models/product");
 const Category = require("../../models/category");
 const Comment = require("../../models/comment");
 
-// exports.listProduct = async (req, res, next) => {
+
 //   try {
 //     const categories = await Category.find({});
 //     const products = await Product.find({});
