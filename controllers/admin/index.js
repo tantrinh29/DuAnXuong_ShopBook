@@ -16,11 +16,11 @@ exports.getAdmin = async (req, res) => {
     const totalOrder = await Order.count({});
     const result = await Order.aggregate([
     {
-      $group: {
-        _id: null,
-        totalPrice: { $sum: "$totalPrice" },
-      },
-    },
+        $group: {
+            _id: null,
+            totalPrice: { $sum: "$totalPrice" },
+        },
+   },
   ]);
 
     const totalPrice = result[0].totalPrice;
@@ -46,17 +46,16 @@ exports.getListUser = (req, res) => {
 
 exports.updateUser = (req, res, next) => {
     let userId = req.params.id;
-    let level = req.body.level;
+    const { level } = req.body;
     Users.findById(userId)
-        .then((huyit) => {
-            huyit.level = level;
-            return huyit.save();
+        .then((kietnt) => {
+            kietnt.level = level;
+            return kietnt.save();
         })
         .then((result) => {
             res.status(200).json({
-                status: "1",
+                status: true,
                 message: "Cập Nhật Thành Viên Thành Công",
-                category: result,
             });
         })
         .catch((err) => {
