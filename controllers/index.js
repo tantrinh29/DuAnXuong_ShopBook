@@ -291,6 +291,7 @@ exports.deleteCart = (req, res) => {
 // show view session cart
 
 exports.getviewCheckOut = async (req, res) => {
+
     const categories = await Category.find({});
   
     const cart = req.session.cart;
@@ -330,6 +331,11 @@ exports.getviewCheckOut = async (req, res) => {
         console.log(err);
       });
   };
+
+
+    
+};
+
 
 // odder
 exports.orderCart = async (req, res) => {
