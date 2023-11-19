@@ -292,44 +292,6 @@ exports.deleteCart = (req, res) => {
 
 exports.getviewCheckOut = async (req, res) => {
 
-    const categories = await Category.find({});
-  
-    const cart = req.session.cart;
-    const email = req.session.email;
-  
-    if (!cart) {
-      return res.render("checkout", {
-        products: [],
-        userOrder: {},
-        totalPrice: 0,
-        categories: categories,
-      });
-    }
-  
-    User.findOne({ email: email })
-      .then((user) => {
-        const userOrder = {
-          fullname: user.fullname,
-          email: user.email,
-        };
-  
-        const products = [];
-        if (cart && cart.huydev && Object.keys(cart.huydev).length !== 0) {
-          for (const key in cart.huydev) {
-            products.push(cart.huydev[key]);
-          }
-        }
-  
-        res.render("checkout", {
-          categories: categories,
-          products: products,
-          totalPrice: cart.totalPrice,
-          userOrder: userOrder,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   };
 
 // odder
