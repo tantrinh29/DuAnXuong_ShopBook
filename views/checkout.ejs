@@ -147,37 +147,38 @@
   </div>
 </main>
 <script>
-  // Gửi Data
-  $("#addOrderCart").on("click", function() {
-      $.ajax({
-          type: "POST",
-          dataType: "JSON",
-          url: "/orderCart",
-          data: {
-              type: 'orderCart',
-              fullname: $("#fullname").val(),
-              email: $("#email").val(),
-              phone: $("#phone").val(),
-              address: $("#address").val(),
-              comment: $("#comment").val(),
-          },
-          success: function(res) {
-              Swal.fire({
-                  icon: res.status === true ? "success" : "error",
-                  title: 'Thông Báo',
-                  text: res.message
-                  }).then((result) => {
-                  if (res.status === true) {
-                     
-                  } else {
-                    
-                  }
-              });
-          },
-          error: function (xhr, status, error) {
-              console.error(error);
-          },
-      });
-  });
+   $("#addOrderCart").on("click", function() {
+      $.ạjax({
+        type: "POST",
+        dataType: "JSON",
+        url: "/orderCart",
+        data: {
+          type: 'orderCart',
+          fullname: $("#fullname").val(),
+          email: $("#email").val(),
+          phone: $("#phone").val(),
+          address: $("#address").val(),
+          comment: $("#comment").val(),
+        },
+        success: function(res) {
+          Swal.fire({
+            icon: res.status === true ? "success" : "error",
+            title: 'Thong bao',
+            text: res.message
+          }).then((result) => {
+            if(res.status === true ) {
+
+            }else {
+
+            }
+          })
+        },
+        error: function(xhr, status, error) {
+          console.log(error)
+        }
+      })
+   })
+
+
 </script>
 <%- include('layout/footer.ejs') %>
