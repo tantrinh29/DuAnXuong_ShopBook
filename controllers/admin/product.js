@@ -3,36 +3,6 @@ const Product = require("../../models/product");
 const Category = require("../../models/category");
 const Comment = require("../../models/comment");
 
-
-//   try {
-//     const categories = await Category.find({});
-//     const products = await Product.find({});
-//     const comments = await Comment.find({});
-//     // loop
-//     for (let product of products) {
-//       const totalComment = await Comment.count({
-//         slugProduct: product.slugProduct,
-//       });
-//       product.review_count = totalComment; // lấy ra rồi update thôi
-//       console.log("Tổng Comment :", product.review_count);
-//       console.log("Tổng Product :", products.length);
-//       // tb
-//       const averageComment = totalComment / products.length;
-
-//       product.average_score = averageComment.toFixed(1);
-
-//       product.save();
-//       console.log(`Trung Bình Comment "${product.title}" : ${averageComment}`);
-//     }
-//     // console.log(products);
-//     res.render("admin/ListProducts", {
-//       showCategories: categories,
-//       showProduct: products,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 exports.listProduct = async (req, res, next) => {
   try {
     const categories = await Category.find({});
@@ -142,19 +112,19 @@ exports.updateProduct = (req, res, next) => {
   let categoryName = req.body.categoryName;
   let slugProduct = slug(title);
   Product.findById(productId)
-    .then((huyit) => {
-      huyit.title = title;
-      huyit.author = author;
-      huyit.price = price;
-      huyit.image = image;
-      huyit.year = year;
-      huyit.isbn = isbn;
-      huyit.average_score = average_score;
-      huyit.describeProduct = describeProduct;
-      huyit.descriptionProduct = descriptionProduct;
-      huyit.categoryName = categoryName;
-      huyit.slugProduct = slugProduct;
-      return huyit.save();
+    .then((data) => {
+      data.title = title;
+      data.author = author;
+      data.price = price;
+      data.image = image;
+      data.year = year;
+      data.isbn = isbn;
+      data.average_score = average_score;
+      data.describeProduct = describeProduct;
+      data.descriptionProduct = descriptionProduct;
+      data.categoryName = categoryName;
+      data.slugProduct = slugProduct;
+      return data.save();
     })
     .then((result) => {
         res.redirect('/admin/product');

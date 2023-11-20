@@ -293,6 +293,7 @@ exports.deleteCart = (req, res) => {
 exports.getviewCheckOut = async (req, res) => {
     const categories = await Category.find({});
 
+
     const cart = req.session.cart;
     const email = req.session.email;
   
