@@ -12,7 +12,7 @@ exports.addCategory = (req, res, next) => {
   let categorySlug = slug(categoryName);
   if (categoryName == "") {
     res.status(200).json({ status: false, message: "Không Được Để Trống" });
-  } b
+  } 
   else {
     const cate = new Category({
       categoryName,
