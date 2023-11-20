@@ -291,12 +291,89 @@ exports.deleteCart = (req, res) => {
 // show view session cart
 
 exports.getviewCheckOut = async (req, res) => {
+    const categories = await Category.find({});
 
-};
+
+    const cart = req.session.cart;
+    const email = req.session.email;
+  
+    if (!cart) {
+      return res.render("checkout", {
+        products: [],
+        userOrder: {},
+        totalPrice: 0,
+        categories: categories,
+      });
+    }
+  
+    User.findOne({ email: email })
+      .then((user) => {
+        const userOrder = {
+          fullname: user.fullname,
+          email: user.email,
+        };
+  
+        const products = [];
+        if (cart && cart.item && Object.keys(cart.item).length !== 0) {
+          for (const key in cart.item) {
+            products.push(cart.item[key]);
+          }
+        }
+  
+        res.render("checkout", {
+          categories: categories,
+          products: products,
+          totalPrice: cart.totalPrice,
+          userOrder: userOrder,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
 // odder
 exports.orderCart = async (req, res) => {
+    const { email, cart } = req.session;
 
+    if (
+      req.body.address == "" ||
+      req.body.phone == "" ||
+      req.body.comment == ""
+    ) {
+      return res.status(200).json({
+        status: false,
+        message: `Không Được Để Trống`,
+      });
+    } else {
+      try {
+        const productsList = Object.values(cart.item); // lấy ra giá trị các sản phẩm
+        console.log("Sản Phẩm Item Order :", productsList);
+  
+        const orderData = new Order({
+          emailOrder: email,
+          codeOrder: random(5).toUpperCase(),
+          products: productsList,
+          totalPrice: cart.totalPrice || 0,
+          status: "Processed",
+          address: req.body.address,
+          phone: req.body.phone,
+          comment: req.body.comment,
+        });
+  
+        await orderData.save(); // lưu
+        req.session.cart = null; // xóa session giỏ hàng sau khi đặt hàng thành công
+        return res.status(200).json({
+          status: true,
+          message: `Đặt Hàng Với Email [${email}] Thành Công`,
+        });
+      } catch (error) {
+        return res.status(200).json({
+          status: false,
+          message: `Đã có lỗi xảy ra trong quá trình đặt hàng.`,
+        });
+      }
+    }
 };
 
 // list order
