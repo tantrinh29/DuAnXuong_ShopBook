@@ -333,7 +333,46 @@ exports.getviewCheckOut = async (req, res) => {
 
 // odder
 exports.orderCart = async (req, res) => {
+    const { email, cart } = req.session;
 
+    if (
+      req.body.address == "" ||
+      req.body.phone == "" ||
+      req.body.comment == ""
+    ) {
+      return res.status(200).json({
+        status: false,
+        message: `Không Được Để Trống`,
+      });
+    } else {
+      try {
+        const productsList = Object.values(cart.item); // lấy ra giá trị các sản phẩm
+        console.log("Sản Phẩm Item Order :", productsList);
+  
+        const orderData = new Order({
+          emailOrder: email,
+          codeOrder: random(5).toUpperCase(),
+          products: productsList,
+          totalPrice: cart.totalPrice || 0,
+          status: "Processed",
+          address: req.body.address,
+          phone: req.body.phone,
+          comment: req.body.comment,
+        });
+  
+        await orderData.save(); // lưu
+        req.session.cart = null; // xóa session giỏ hàng sau khi đặt hàng thành công
+        return res.status(200).json({
+          status: true,
+          message: `Đặt Hàng Với Email [${email}] Thành Công`,
+        });
+      } catch (error) {
+        return res.status(200).json({
+          status: false,
+          message: `Đã có lỗi xảy ra trong quá trình đặt hàng.`,
+        });
+      }
+    }
 };
 
 // list order
