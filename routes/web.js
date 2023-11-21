@@ -4,7 +4,13 @@ const userController = require("../controllers/auth");
 const indexController = require("../controllers/index");
 const Category = require("../models/category");
 
-
+// check login
+function checkLoggedIn(req, res, next) {
+  if (!req.session.loggedin) {
+    return res.redirect("/login");
+  }
+  next();
+}
 
 router.get("/", indexController.getIndex);
 router.get("/detail/:slug", indexController.getDetail);
@@ -15,20 +21,6 @@ router.post("/addToCart", indexController.addToCart);
 router.get("/cart", indexController.viewCart);
 router.post("/updateCart", indexController.updateCart);
 router.post("/deleteCart", indexController.deleteCart);
-
-router.get("/checkout",  indexController.getviewCheckOut);
-
-
-
-
-
-
-
-
-
-
-
-=======
 router.get("/checkout", checkLoggedIn, indexController.getviewCheckOut);
 router.post("/orderCart", indexController.orderCart);
 
@@ -55,6 +47,10 @@ router.get("/login", async (req, res, next) => {
   const categories = await Category.find({});
   res.render("auth/login", { categories: categories });
 });
+router.get("/resetpassword", async (req, res, next) => {
+  const categories = await Category.find({});
+  res.render("auth/resetpassword", { categories: categories });
+});
 router.post("/postCreateUser", userController.createUser);
 router.post("/postLoginUser", userController.loginUser);
 router.get("/logout", (req, res) => {
@@ -66,6 +62,5 @@ router.get("/logout", (req, res) => {
     }
   });
 });
-
 
 module.exports = router;
