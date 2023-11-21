@@ -378,7 +378,16 @@ exports.orderCart = async (req, res) => {
 
 // list order
 exports.getListOrder = async (req, res) => {
-
+    const categories = await Category.find({});
+    const email = req.session.email;
+    Order.find({ emailOrder: email })
+      .then((order) => {
+        res.render("listOrder", { orders: order, categories: categories });
+        console.log(order);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 };
 
 exports.getDetailOrder = async (req, res, next) => {
