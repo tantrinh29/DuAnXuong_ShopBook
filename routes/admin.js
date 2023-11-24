@@ -9,5 +9,5 @@ router.get(
   "/detailOrder/:codeOrder",
   indexController.getDetailOrder
 );
-
-router.get("/updateOrder/:id",  indexController.updateOrder);
+router.post("/updateOrder/:id",  indexController.updateOrder);
+router.post("/deleteOrder/:id", indexController.deleteOrder);
