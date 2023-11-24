@@ -64,6 +64,10 @@
                                                                 <form class="updateUserForm" data-user-id="<%= listUsers[i]._id %>">
                                                                     <div class="mb-3">
                                                                         <input type="hidden" name="id" class="userId" value="<%= listUsers[i]._id %>">
+                                                                        <div class="mb-3">
+                                                                            <label for="edittitle" class="form-label">FULL NAME</label>
+                                                                            <input type="text" class="form-control userName" id="name" name="name" value="<%= listUsers[i].fullname %>" required>
+                                                                        </div>
                                                                         <label for="edittitle" class="form-label">LEVEL</label>
                                                                         <select class="custom-select userLevel" name="level">
                                                                             <option <%= listUsers[i].level === 'admin' ? 'selected' : '' %> value="admin">Admin</option>
@@ -101,6 +105,7 @@
                 var form = $(this);
                 var userID = form.find('.userId').val();
                 var userLevel = form.find('.userLevel').val();
+                var userName = form.find('.userName').val();
 
                 // Gửi yêu cầu Ajax
                 $.ajax({
@@ -109,7 +114,8 @@
                     url: "/admin/updateUser/" + userID,
                     data: {
                         level: userLevel,
-                        id: userID
+                        id: userID,
+                        name: userName
                     },
                     success: function(res) {
                         $('#modal' + userID).modal('hide');
@@ -118,10 +124,9 @@
                             title: 'Thông Báo',
                             text: res.message
                         }).then((result) => {
-                            if (res.status === true) {
-                                $('#datatable1').load(location.href + " #datatable1");
-                            } else {
-                                // Xử lý tình huống khác nếu cần
+                            // Chỉ làm mới trang khi người dùng đóng thông báo Swal
+                            if (result.isConfirmed || result.isDismissed) {
+                                location.reload(true);
                             }
                         });
                     },
@@ -130,6 +135,7 @@
                     }
                 });
             });
+
             $(function() {
                 $("#datatable1").DataTable();
             });
