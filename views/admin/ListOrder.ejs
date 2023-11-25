@@ -39,7 +39,7 @@
                   <td><%= index + 1 %></td>
                   <td><%= order.codeOrder %></td>
                   <td><%= order.emailOrder %></td>
-                  <td style = "font-weight:bold;<% if (order.status === 'Processed') { %>color: red; <% } else if (order.status === 'Delivering') { %>color: #d51ac0;<% } else { %>color: #66CC33;<% } %>"><%= order.status %></td>
+                  <td style = "font-weight:bold" <% if (order.status === 'Processed') { %>color: red; <% } else if (order.status === 'Delivering') { %>color: #d51ac0;<% } else { %>color: #66CC33;<% } %>"><%= order.status %></td>
 
                   <td><%= formatNumber(order.totalPrice) %></td>
                   <td>
