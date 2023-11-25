@@ -91,6 +91,10 @@ router.get(
   indexController.getDetailOrder
 );
 
+router.post("/updateOrder/:id",  indexController.updateOrder);
+router.post("/deleteOrder/:id", indexController.deleteOrder);
+=======
+
 router.get("/updateOrder/:id", requireAdmin, indexController.updateOrder);
 
 // ====================== Comment ========================= //
@@ -99,3 +103,4 @@ router.get("/listComment", requireAdmin, commentController.listComment);
 router.get("/deleteComment/:cmtId", requireAdmin, commentController.deleteComment);
 
 module.exports = router;
+
