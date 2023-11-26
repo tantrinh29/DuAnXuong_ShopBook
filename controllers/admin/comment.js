@@ -11,7 +11,12 @@ exports.listComment = async (req, res, next) => {
           slugProduct: comment.slugProduct,
         }).lean();
         // console.log(product.title);
-        return { ...comment, productName: product.title };
+        if (product) {
+          return { ...comment, productName: product.title };
+        } else {
+          // Handle the case where the product is not found (null)
+          return { ...comment, productName: "Product not found" };
+        }
       })
     );
     // console.log(showComment);
@@ -26,9 +31,9 @@ exports.deleteComment = (req, res, next) => {
   Comment.deleteOne({ _id: commentID })
     .then((post) => {
       if (post.deletedCount > 0) {
-        res
-          .status(200)
-          .json({ status: true, message: "Xóa Đánh Giá Thành Công" });
+        // Include a script in the response to show an alert
+        const script = `<script>alert("Xóa Đánh Giá Thành Công"); window.location.href = '/admin/listComment';</script>`;
+        res.status(200).send(script);
       } else {
         const error = new Error("Không tìm thấy Đánh Giá này");
         error.statusCode = 404;
@@ -42,3 +47,4 @@ exports.deleteComment = (req, res, next) => {
       next(err);
     });
 };
+
