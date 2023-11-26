@@ -47,10 +47,13 @@ router.get("/login", async (req, res, next) => {
   const categories = await Category.find({});
   res.render("auth/login", { categories: categories });
 });
-router.get("/resetpassword", async (req, res, next) => {
-  const categories = await Category.find({});
-  res.render("auth/resetpassword", { categories: categories });
-});
+
+router.get("/forgot-password",  userController.getForgotPassword);
+router.post("/forgot-password", userController.postForgotPassword);
+router.get("/reset-password", userController.getResetPassword);
+router.get("/reset-password/:resetToken", userController.getResetPassword);
+router.post("/reset-password", userController.postResetPassword);
+
 router.post("/postCreateUser", userController.createUser);
 router.post("/postLoginUser", userController.loginUser);
 router.get("/logout", (req, res) => {
@@ -62,5 +65,6 @@ router.get("/logout", (req, res) => {
     }
   });
 });
+
 
 module.exports = router;
