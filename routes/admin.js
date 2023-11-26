@@ -93,7 +93,7 @@ router.get(
 
 router.post("/updateOrder/:id",  indexController.updateOrder);
 router.post("/deleteOrder/:id", indexController.deleteOrder);
-=======
+
 
 router.get("/updateOrder/:id", requireAdmin, indexController.updateOrder);
 
