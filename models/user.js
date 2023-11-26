@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const postSchema = new Schema(
+const userSchema = new Schema(
   {
     fullname: {
       type: String,
       required: true,
-      unique: true, // để đảm bảo rằng các tên người dùng không trùng lặp
+      unique: true,
     },
     password: {
       type: String,
@@ -21,6 +21,10 @@ const postSchema = new Schema(
       type: String,
       required: true,
     },
+    resetToken: {
+      type: String,
+  
+    },
     level: {
       type: String,
       enum: ["member", "admin"],
@@ -32,4 +36,4 @@ const postSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("Users", postSchema);
+module.exports = mongoose.model("User", userSchema);

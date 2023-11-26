@@ -1,10 +1,6 @@
 <%- include('_layout/header.ejs') %> <%- include('_layout/nav.ejs') %>
-        <% function formatNumber(num) {
-  if (num == null) {
-    return "0"; 
-   } 
-   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,"); } 
-   %>
+        <% function formatNumber(num) { if (num==null) { return "0" ; } return
+            num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1," ); } %>
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <div class="row mb-2">
                 <div class="col-sm-6"></div>
@@ -19,7 +15,8 @@
                         <div class="card-header">
                             <h3 class="card-title">NHÓM PRODUCT</h3>
                             <div class="text-right">
-                                <a type="button" class="btn btn-default" data-toggle="modal" data-target="#modal-default" class="btn btn-info">THÊM SẢN PHẨM</a>
+                                <a type="button" class="btn btn-default" data-toggle="modal"
+                                    data-target="#modal-default" class="btn btn-info">THÊM SẢN PHẨM</a>
                             </div>
                         </div>
                         <!-- /.card-header -->
@@ -74,67 +71,107 @@
                                                 <td class="text-center">
                                                     <%= showProduct[i].categoryName %>
                                                 </td>
-                                                <td >
+                                                <td>
                                                     <div class="d-flex">
-                                                        <button class="btn btn-info mr-2" data-toggle="modal" data-target="#huydev<%= showProduct[i]._id %>" type="submit" style="color: #fff" >
-                                                         Edit
+                                                        <button class="btn btn-info mr-2" data-toggle="modal"
+                                                            data-target="#huydev<%= showProduct[i]._id %>" type="submit"
+                                                            style="color: #fff">
+                                                            Edit
                                                         </button>
                                                         <div class="modal fade" id="huydev<%= showProduct[i]._id %>">
                                                             <div class="modal-dialog" role="document">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h5 class="modal-title" id="exampleModalLabel">EDIT PRODUCT ID [ <%= showProduct[i]._id %> ]</h5>
-                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" >
-                                                                          <span aria-hidden="true">&times;</span>
+                                                                        <h5 class="modal-title" id="exampleModalLabel">
+                                                                            EDIT PRODUCT ID [ <%= showProduct[i]._id %>
+                                                                                ]</h5>
+                                                                        <button type="button" class="close"
+                                                                            data-dismiss="modal" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
                                                                         </button>
                                                                     </div>
                                                                     <div class="modal-body">
-                                                                        <form action="/admin/updateProduct/<%= showProduct[i]._id %>" method="POST">
+                                                                        <form
+                                                                            action="/admin/updateProduct/<%= showProduct[i]._id %>"
+                                                                            method="POST">
                                                                             <div class="mb-3">
-                                                                                <label for="edittitle" class="form-label">TITLE</label>
-                                                                                <input type="text" class="form-control" id="title" name="title" value="<%= showProduct[i].title %>" required>
+                                                                                <label for="edittitle"
+                                                                                    class="form-label">TITLE</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="title" name="title"
+                                                                                    value="<%= showProduct[i].title %>"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="mb-3">
-                                                                                <label for="edittitle" class="form-label">AUTHOR</label>
-                                                                                <input type="text" class="form-control" id="author" name="author" value="<%= showProduct[i].author %>" required>
+                                                                                <label for="edittitle"
+                                                                                    class="form-label">AUTHOR</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="author" name="author"
+                                                                                    value="<%= showProduct[i].author %>"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="mb-3">
-                                                                                <label for="edittitle" class="form-label">IMAGE</label>
-                                                                                <input type="text" class="form-control" id="image" name="image" value="<%= showProduct[i].image %>" required>
+                                                                                <label for="edittitle"
+                                                                                    class="form-label">IMAGE</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="image" name="image"
+                                                                                    value="<%= showProduct[i].image %>"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="mb-3">
-                                                                                <label for="edittitle" class="form-label">YEAR</label>
-                                                                                <input type="text" class="form-control" id="year" name="year" value="<%= showProduct[i].year %>" required>
+                                                                                <label for="edittitle"
+                                                                                    class="form-label">YEAR</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="year" name="year"
+                                                                                    value="<%= showProduct[i].year %>"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="mb-3">
-                                                                                <label for="edittitle" class="form-label">ISBN</label>
-                                                                                <input type="text" class="form-control" id="isbn" name="isbn" value="<%= showProduct[i].isbn %>" required>
+                                                                                <label for="edittitle"
+                                                                                    class="form-label">ISBN</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="isbn" name="isbn"
+                                                                                    value="<%= showProduct[i].isbn %>"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="mb-3">
-                                                                                <label for="edittitle" class="form-label">AVERAGE SCORE</label>
-                                                                                <input type="text" class="form-control" id="average_score" name="average_score" value="<%= showProduct[i].average_score %>" required>
+                                                                                <label for="edittitle"
+                                                                                    class="form-label">AVERAGE
+                                                                                    SCORE</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="average_score"
+                                                                                    name="average_score"
+                                                                                    value="<%= showProduct[i].average_score %>"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="mb-3">
-                                                                                <label for="edittitle" class="form-label">PRICE</label>
-                                                                                <input type="text" class="form-control" id="price" name="price" value="<%= showProduct[i].price %>" required>
+                                                                                <label for="edittitle"
+                                                                                    class="form-label">PRICE</label>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="price" name="price"
+                                                                                    value="<%= showProduct[i].price %>"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="form-group">
-                                                                                <label for="exampleInputEmail1">DESCRIBE</label>
-                                                                                <input type="text" name="describeProduct" class="form-control" placeholder="Mô Tả Nhỏ" value="<%= showProduct[i].describeProduct %>" required>
+                                                                                <label
+                                                                                    for="exampleInputEmail1">DESCRIBE</label>
+                                                                                <input type="text"
+                                                                                    name="describeProduct"
+                                                                                    class="form-control"
+                                                                                    placeholder="Mô Tả Nhỏ"
+                                                                                    value="<%= showProduct[i].describeProduct %>"
+                                                                                    required>
                                                                             </div>
                                                                             <div class="form-group">
-                                                                                <label for="exampleInputEmail1"
-                                >DESRIPTION</label
-                              >
-                              <textarea
-                                name="descriptionProduct"
-                                placeholder="Nhập Mô Tả Sản Phẩm"
-                                class="textarea"
-                                value="<%= showProduct[i].descriptionProduct %>
+                                                                                <label
+                                                                                    for="exampleInputEmail1">DESRIPTION</label>
+                                                                                <textarea name="descriptionProduct"
+                                                                                    placeholder="Nhập Mô Tả Sản Phẩm"
+                                                                                    class="textarea" value="<%= showProduct[i].descriptionProduct %>
                                 required=""
                               ><%= showProduct[i].descriptionProduct %></textarea>
                             </div>
-                            <div class="mb-3">
+                            <div class=" mb-3">
                               <label for="exampleInputEmail1">CATEGORY NAME</label>
                                                                                 <select class="custom-select" name="categoryName">
                                 <% for(var j=0; j < showCategories.length; j++) { %>
@@ -151,9 +188,7 @@
                                                             </div>
                                                             <!-- /.modal-dialog -->
                                                         </div>
-                                                        <button class="btn btn-success delete-btn" data-product-id="<%= showProduct[i]._id %>" style="color: #fff">
-                    Delete
-                  </button>
+                                                        <button class="btn btn-success delete-btn" data-product-id="<%= showProduct[i]._id %>" style="color: #fff">Delete</button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -224,65 +259,72 @@
                       class="textarea"
                       required=""
                     ></textarea>
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputEmail1">CATEGORY NAME</label>
-                                    <select class="custom-select" name="categoryName">
-                        <% for(var i=0; i < showCategories.length; i++) { %>
-                            <option value="<%= showCategories[i].categorySlug %>">
-                                <%= showCategories[i].categoryName %></option>
-                        <% } %>
-                    </select>
-                                </div>
-                        </div>
-                        <div class="modal-footer justify-content-between">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">ĐÓNG</button>
-                            <button type="submit" class="btn btn-primary">THÊM</button>
-                        </div>
-                        </form>
-                    </div>
-                    <!-- /.modal-content -->
-                </div>
-                <!-- /.modal-dialog -->
-            </div>
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label for="exampleInputEmail1">CATEGORY
+                                                                                    NAME</label>
+                                                                                <select class="custom-select"
+                                                                                    name="categoryName">
+                                                                                    <% for(var i=0; i <
+                                                                                        showCategories.length; i++) { %>
+                                                                                        <option
+                                                                                            value="<%= showCategories[i].categorySlug %>">
+                                                                                            <%= showCategories[i].categoryName
+                                                                                                %>
+                                                                                        </option>
+                                                                                        <% } %>
+                                                                                </select>
+                                                                            </div>
+                                                                    </div>
+                                                                    <div class="modal-footer justify-content-between">
+                                                                        <button type="button" class="btn btn-default"
+                                                                            data-dismiss="modal">ĐÓNG</button>
+                                                                        <button type="submit"
+                                                                            class="btn btn-primary">THÊM</button>
+                                                                    </div>
+                                                                    </form>
+                                                                </div>
+                                                                <!-- /.modal-content -->
+                                                            </div>
+                                                            <!-- /.modal-dialog -->
+                                                        </div>
 
 
 
-            <script>
-                $(document).ready(function() {
-                    $('.delete-btn').on('click', function(event) {
-                        event.preventDefault();
+                                                        <script>
+                                                            $(document).ready(function () {
+                                                                $('.delete-btn').on('click', function (event) {
+                                                                    event.preventDefault();
 
-                        var productId = $(this).data('product-id');
+                                                                    var productId = $(this).data('product-id');
 
-                        $.ajax({
-                            url: '/admin/deleteProduct/' + productId,
-                            type: 'POST',
-                            success: function(res) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: 'Thông Báo',
-                                    text: res.message
-                                }).then((result) => {
-                                    if (res.status === true) {
-                                        // Reload the page after successful deletion
-                                        location.reload(true);
-                                    } else {
-                                        // Handle other scenarios if needed
-                                    }
-                                });
-                            },
-                            error: function(xhr, status, error) {
-                                console.error(error);
-                            }
-                        });
-                    });
-                });
+                                                                    $.ajax({
+                                                                        url: '/admin/deleteProduct/' + productId,
+                                                                        type: 'POST',
+                                                                        success: function (res) {
+                                                                            Swal.fire({
+                                                                                icon: "success",
+                                                                                title: 'Thông Báo',
+                                                                                text: res.message
+                                                                            }).then((result) => {
+                                                                                if (res.status === true) {
+                                                                                    // Reload the page after successful deletion
+                                                                                    location.reload(true);
+                                                                                } else {
+                                                                                    // Handle other scenarios if needed
+                                                                                }
+                                                                            });
+                                                                        },
+                                                                        error: function (xhr, status, error) {
+                                                                            console.error(error);
+                                                                        }
+                                                                    });
+                                                                });
+                                                            });
 
-                $(function() {
-                    $("#datatable1").DataTable();
-                });
-            </script>
+                                                            $(function () {
+                                                                $("#datatable1").DataTable();
+                                                            });
+                                                        </script>
 
-            <%- include('_layout/footer.ejs') %>
-            
+                                                        <%- include('_layout/footer.ejs') %>

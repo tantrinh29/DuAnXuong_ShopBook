@@ -22,11 +22,8 @@ exports.addCategory = (req, res, next) => {
     cate
       .save()
       .then((result) => {
-        res.status(201).json({
-          status: true,
-          message: "Thêm Danh Mục Thành Công",
-          category: result,
-        });
+        const script = `<script>alert("Thêm Danh Mục Thành Công"); window.location.href = '/admin/category';</script>`;
+      res.status(200).send(script);
       })
       .catch((err) => {
         if (!err.statusCode) {
@@ -48,11 +45,8 @@ exports.updateCategory = (req, res, next) => {
       return huyit.save();
     })
     .then((result) => {
-      res.status(200).json({
-        status: "1",
-        message: "Cập Nhật Danh Mục Thành Công",
-        category: result,
-      });
+      const script = `<script>alert("Sửa Danh Mục Thành Công"); window.location.href = '/admin/category';</script>`;
+      res.status(200).send(script);
     })
     .catch((err) => {
       if (!err.statusCode) {
@@ -67,11 +61,11 @@ exports.deleteCategory = (req, res, next) => {
   Category.deleteOne({ _id: cateId })
     .then((post) => {
       if (post.deletedCount > 0) {
-        res
-          .status(200)
-          .json({ status: true, message: "Xóa Danh Mục Thành Công" });
+        // Include a script in the response to show an alert
+        const script = `<script>alert("Xóa Danh Mục Thành Công"); window.location.href = '/admin/category';</script>`;
+        res.status(200).send(script);
       } else {
-        const error = new Error("Không tìm thấy danh mục này");
+        const error = new Error("Không tìm thấy Danh mục này");
         error.statusCode = 404;
         throw error;
       }
