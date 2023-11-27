@@ -46,8 +46,12 @@ app.use(function (req, res, next) {
   res.locals.loggedin = req.session.loggedin;
   res.locals.email = req.session.email;
   res.locals.totalPrice = req.session.totalPrice;
+  res.locals.address = req.session.address;  // Chỉnh sửa dòng này
+  res.locals.phone = req.session.phone;      // Chỉnh sửa dòng này
+  res.locals.comment = req.session.comment;  // Chỉnh sửa dòng này
   next();
 });
+
 
 app.use(function (req, res, next) {
   const cart = req.session.cart;

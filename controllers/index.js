@@ -4,7 +4,7 @@ const Comment = require("../models/comment");
 const Order = require("../models/order");
 const User = require("../models/user");
 const Category = require("../models/category");
-
+const VnPayModel = require("../models/vnpay");
 
 exports.getIndex = async (req, res) => {
   try {
@@ -380,47 +380,86 @@ exports.getviewCheckOut = async (req, res) => {
 };
 
 // odder
-exports.orderCart = async (req, res) => {
-  const { email, cart } = req.session;
 
-  if (
-    req.body.address == "" ||
-    req.body.phone == "" ||
-    req.body.comment == ""
-  ) {
+const createVnpayPayment = async (orderData) => {
+
+  try {
+    const result = await VnPayModel.create({
+      vnp_Amount: orderData.vnp_Amount,
+      vnp_BankTranNo: orderData.vnp_BankCode,
+      vnp_TransactionNo: orderData.vnp_BankTranNo,
+    });
+
+    return result._id;
+  } catch (error) {
+    console.error("Lỗi khi tạo thanh toán Vnpay:", error);
+    throw error;
+  }
+};
+
+const createOrder = async (
+  email,
+  productsList,
+  cart,
+  vnpayID,
+  paymentMethod,
+  address,
+  phone,
+  comment
+) => {
+  try {
+    const orderData = new Order({
+      emailOrder: email,
+      codeOrder: random(5).toUpperCase(),
+      products: productsList,
+      totalPrice: cart.totalPrice || 0,
+      status: "Processed",
+      paymentMethod: paymentMethod,
+      vnpayID: vnpayID,
+      address: address,
+      phone: phone,
+      comment: comment,
+    });
+    await orderData.save();
+  } catch (error) {
+    console.error("Lỗi khi tạo đơn hàng:", error);
+    throw error;
+  }
+};
+exports.orderCart = async (req, res) => {
+  const { email, cart, address, phone, comment } = req.session;
+  console.log(req.body);
+  try {
+    const productsList = Object.values(cart.huydev);
+    const vnpayID =
+      req.body.paymentMethod === "vnpay"
+        ? await createVnpayPayment({
+            vnp_Amount: req.body.vnpAmount,
+            vnp_BankCode: req.body.vnpBankCode,
+            vnp_BankTranNo: req.body.vnpTransactionNo,
+          })
+        : null;
+    await createOrder(
+      email,
+      productsList,
+      cart,
+      vnpayID,
+      req.body.paymentMethod,
+      address,
+      phone,
+      comment
+    );
+
+    return res.status(200).json({
+      status: true,
+      message: `Đặt Hàng Với Email [${email}] Thành Công`,
+    });
+  } catch (error) {
+    console.log(error);
     return res.status(200).json({
       status: false,
-      message: `Không Được Để Trống`,
+      message: `Đã có lỗi xảy ra trong quá trình đặt hàng.`,
     });
-  } else {
-    try {
-      const productsList = Object.values(cart.huydev); // lấy ra giá trị các sản phẩm
-      console.log("Sản Phẩm Item Order :", productsList);
-
-      const orderData = new Order({
-        emailOrder: email,
-        codeOrder: random(5).toUpperCase(),
-        products: productsList,
-        totalPrice: cart.totalPrice || 0,
-        status: "Processed",
-        address: req.body.address,
-        phone: req.body.phone,
-        comment: req.body.comment,
-      });
-
-      await orderData.save(); // lưu
-      req.session.cart = null; // xóa session giỏ hàng sau khi đặt hàng thành công
-      return res.status(200).json({
-        status: true,
-        message: `Đặt Hàng Với Email [${email}] Thành Công`,
-      });
-    } catch (error) {
-      console.log(error);
-      return res.status(200).json({
-        status: false,
-        message: `Đã có lỗi xảy ra trong quá trình đặt hàng.`,
-      });
-    }
   }
 };
 
@@ -449,7 +488,7 @@ exports.getDetailOrder = async (req, res, next) => {
   const codeOrder = req.params.codeOrder;
   Order.findOne({ codeOrder: codeOrder })
     .then((huydev) => {
-      res.render("listDetailOrder", {
+      res.render("listDetailOrder.ejs", {
         detailOrders: huydev,
         categories: categories,
       });

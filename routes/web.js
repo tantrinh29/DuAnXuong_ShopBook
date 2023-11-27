@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require("../controllers/auth");
 const indexController = require("../controllers/index");
 const Category = require("../models/category");
+const vnpayController = require("../controllers/vnpayControllers");
 
 // check login
 function checkLoggedIn(req, res, next) {
@@ -30,13 +31,13 @@ router.get(
   checkLoggedIn,
   indexController.getDetailOrder
 );
-router.get("/statusOrder/:id", checkLoggedIn, indexController.getStatusComplete);
-
+router.get(
+  "/statusOrder/:id",
+  checkLoggedIn,
+  indexController.getStatusComplete
+);
 
 router.get("/categories/:slug", indexController.getProductOfCategory);
-
-
-
 
 router.get("/register", async (req, res, next) => {
   const categories = await Category.find({});
@@ -48,7 +49,7 @@ router.get("/login", async (req, res, next) => {
   res.render("auth/login", { categories: categories });
 });
 
-router.get("/forgot-password",  userController.getForgotPassword);
+router.get("/forgot-password", userController.getForgotPassword);
 router.post("/forgot-password", userController.postForgotPassword);
 router.get("/reset-password", userController.getResetPassword);
 router.get("/reset-password/:resetToken", userController.getResetPassword);
@@ -66,5 +67,28 @@ router.get("/logout", (req, res) => {
   });
 });
 
+// api vnpay
+router.post("/orderPayment/:payment", vnpayController.orderPayment);
 
+router.get("/ttonline", async (req, res, next) => {
+  try {
+    const categories = await Category.find({});
+    
+    const paymentMethod = req.query.paymentMethod || '';
+    const vnpAmount = req.query.vnp_Amount || '';
+    const vnpBankCode = req.query.vnp_BankCode || '';
+    const vnpTransactionNo = req.query.vnp_TransactionNo || '';
+
+    res.render("ttonline", {
+      categories: categories,
+      paymentMethod: paymentMethod,
+      vnpAmount: vnpAmount,
+      vnpBankCode: vnpBankCode,
+      vnpTransactionNo: vnpTransactionNo,
+    });
+  } catch (error) {
+    console.error("Lỗi truy vấn MongoDB:", error);
+    next(error);
+  }
+});
 module.exports = router;
