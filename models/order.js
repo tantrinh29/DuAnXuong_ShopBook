@@ -39,6 +39,12 @@ const orderSchema = new Schema({
     type: String,
     required: true,
   },
+  paymentMethod: {
+    type: String,
+    required: true,
+  },
+  vnpayID: { type: mongoose.Schema.Types.ObjectId, ref: "PaymentVnpay" },
+
   comment: {
     type: String,
     required: true,
