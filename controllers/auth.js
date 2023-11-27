@@ -51,7 +51,9 @@ exports.createUser = (req, res, next) => {
 exports.loginUser = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(200).json({ status: false, message: "Không Được Để Trống" });
+    return res
+      .status(200)
+      .json({ status: false, message: "Không Được Để Trống" });
   }
 
   User.findOne({ email: email })
@@ -72,7 +74,7 @@ exports.loginUser = (req, res, next) => {
             message: "Có lỗi xảy ra trong quá trình đăng nhập",
           });
         }
-        console.log('Kết quả của bcrypt.compare:', result);
+        console.log("Kết quả của bcrypt.compare:", result);
 
         if (result) {
           req.session.loggedin = true;
@@ -84,7 +86,9 @@ exports.loginUser = (req, res, next) => {
             message: "Đăng nhập thành công",
           });
         } else {
-          return res.status(200).json({ status: false, message: "Đăng nhập thất bại" });
+          return res
+            .status(200)
+            .json({ status: false, message: "Đăng nhập thất bại" });
         }
       });
     })
@@ -103,15 +107,17 @@ exports.getForgotPassword = (req, res, next) => {
 
 exports.postForgotPassword = (req, res, next) => {
   const { email } = req.body;
-  let resetToken;  // Di chuyển khai báo lên đầu hàm
+  let resetToken; // Di chuyển khai báo lên đầu hàm
 
   // Tạo mã xác nhận (reset token)
-  resetToken = crypto.randomBytes(20).toString("hex");  // Di chuyển gán giá trị vào đây
+  resetToken = crypto.randomBytes(20).toString("hex"); // Di chuyển gán giá trị vào đây
 
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
-        return res.status(404).json({ status: false, message: "Email không tồn tại" });
+        return res
+          .status(404)
+          .json({ status: false, message: "Email không tồn tại" });
       }
 
       // Lưu mã xác nhận vào cơ sở dữ liệu
@@ -127,7 +133,7 @@ exports.postForgotPassword = (req, res, next) => {
           pass: "oamdcbbrfbesdwdx",
         },
       });
-      
+
       const mailOptions = {
         from: "dinhtrinh5678@gmail.com",
         to: email,
@@ -151,8 +157,6 @@ exports.postForgotPassword = (req, res, next) => {
     });
 };
 
-
-
 exports.getResetPassword = (req, res, next) => {
   const resetToken = req.params.resetToken;
 
@@ -161,9 +165,11 @@ exports.getResetPassword = (req, res, next) => {
     resetToken: resetToken,
   })
     .then((user) => {
-      console.log('User:', user);  // Log giá trị user để kiểm tra
+      console.log("User:", user); // Log giá trị user để kiểm tra
       if (!user) {
-        return res.status(400).json({ status: false, message: "Mã xác nhận không hợp lệ" });
+        return res
+          .status(400)
+          .json({ status: false, message: "Mã xác nhận không hợp lệ" });
       }
 
       // Hiển thị trang để người dùng nhập mật khẩu mới
@@ -175,25 +181,31 @@ exports.getResetPassword = (req, res, next) => {
 };
 
 exports.postResetPassword = (req, res, next) => {
-  const resetToken = req.params.resetToken;
+  const resetToken = req.body.resetToken;
   const newPassword = req.body.newPassword;
 
   if (!newPassword || newPassword.trim() === "") {
-    return res.status(400).json({ status: false, message: "Mật khẩu mới không hợp lệ" });
+    return res
+      .status(400)
+      .json({ status: false, message: "Mật khẩu mới không hợp lệ" });
   }
 
-  bcrypt.hash(newPassword, 10)
+  bcrypt
+    .hash(newPassword, 10)
     .then((hashedPassword) => {
-      // Sử dụng findOneAndUpdate để cập nhật trực tiếp trong database
+      console.log("hashedPassword", hashedPassword);
       return User.findOneAndUpdate(
         { resetToken: resetToken },
-        { $set: { password: hashedPassword, resetToken: undefined } },
-        { new: true } // Trả về bản ghi đã được cập nhật
+        { $set: { password: hashedPassword, resetToken: "" } },
+        { new: true } 
       );
     })
     .then((updatedUser) => {
+      console.log(updatedUser)
       if (!updatedUser) {
-        return res.status(400).json({ status: false, message: "Mã xác nhận không hợp lệ" });
+        return res
+          .status(400)
+          .json({ status: false, message: "Mã xác nhận không hợp lệ" });
       }
 
       // Gửi phản hồi thành công
@@ -202,17 +214,11 @@ exports.postResetPassword = (req, res, next) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).json({ status: false, message: "Có lỗi xảy ra khi cập nhật mật khẩu" });
+      res
+        .status(500)
+        .json({
+          status: false,
+          message: "Có lỗi xảy ra khi cập nhật mật khẩu",
+        });
     });
 };
-
-
-
-
-
-
-
-
-
-
-
