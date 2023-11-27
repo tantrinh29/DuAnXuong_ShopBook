@@ -450,6 +450,9 @@ exports.orderCart = async (req, res) => {
       comment
     );
 
+    // Xóa giỏ hàng sau khi đặt hàng thành công
+    req.session.cart = {};
+    
     return res.status(200).json({
       status: true,
       message: `Đặt Hàng Với Email [${email}] Thành Công`,

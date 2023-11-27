@@ -38,6 +38,7 @@
                     <th class="pro-title">Ngày Đặt</th>
                     <th class="pro-price">Tình Trạng</th>
                     <th class="pro-quantity">Tổng Tiền</th>
+                    <th class="pro-paymentMethod">Phương thức TT</th>
                     <th class="pro-subtotal">Thao Tác</th>
                   </tr>
                 </thead>
@@ -56,6 +57,17 @@
                           <% } %>
                         </td>
                         <td><%= formatNumber(order.totalPrice) %></td>
+                        <td>
+                          <% if (order.paymentMethod === 'vnpay') { %>
+                            Thanh toán qua VNPAY
+                          <% } else if (order.paymentMethod === 'delivery') { %>
+                            Thanh toán khi nhận hàng
+                          <% } else { %>
+                            <!-- Xử lý trường hợp khác nếu cần -->
+                            <%= order.paymentMethod %>
+                          <% } %>
+                        </td>
+                        
                         <td>
                           <a href="/detailOrder/<%= order.codeOrder %>" class="btn btn-info text-light">Chi Tiết</a>
                         </td>

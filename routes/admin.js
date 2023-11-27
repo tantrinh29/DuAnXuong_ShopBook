@@ -5,6 +5,21 @@ const indexController = require("../controllers/admin/index");
 const categoryController = require("../controllers/admin/category");
 const productController = require("../controllers/admin/product");
 const commentController = require("../controllers/admin/comment");
+////////////////////////////////
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'public/uploads');
+  },
+  filename: function (req, file, cb) {
+      cb(null, file.originalname);
+  }
+});
+
+const upload = multer({ storage: storage });
+
+
 
 // phân quyền
 async function requireAdmin(req, res, next) {
@@ -70,7 +85,9 @@ router.post(
 router.post("/deleteCategory/:cateId", categoryController.deleteCategory);
 // ====================== product  ====================== //
 router.get("/product", requireAdmin, productController.listProduct);
-router.post("/addProduct", requireAdmin, productController.addProduct);
+
+router.post("/addProduct", requireAdmin, upload.single('image'), productController.addProduct);
+
 router.post(
   "/updateProduct/:productId",
   requireAdmin,
