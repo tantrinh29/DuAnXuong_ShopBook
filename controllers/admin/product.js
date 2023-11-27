@@ -2,6 +2,10 @@ const slug = require("url-slug");
 const Product = require("../../models/product");
 const Category = require("../../models/category");
 const Comment = require("../../models/comment");
+// //////////////////////////////////////////
+
+const path = require('path');
+////////////////////////////////////////////
 
 exports.listProduct = async (req, res, next) => {
     try {
@@ -39,11 +43,14 @@ exports.listProduct = async (req, res, next) => {
         next(error);
     }
 };
+
+
+
+
 exports.addProduct = (req, res, next) => {
     let title = req.body.title;
     let author = req.body.author;
     let price = req.body.price;
-    let image = req.body.image;
     let year = req.body.year;
     let isbn = req.body.isbn;
     let review_count = req.body.review_count;
@@ -51,12 +58,20 @@ exports.addProduct = (req, res, next) => {
     let describeProduct = req.body.describeProduct;
     let descriptionProduct = req.body.descriptionProduct;
     let categoryName = req.body.categoryName;
-    let slugProduct = slug(title);
+
+    // Thêm đoạn code để xử lý đường dẫn của file ảnh đã được tải lên
+    let image;
+    if (req.file) {
+        image = '/uploads/' + req.file.filename;
+    } else {
+        // Nếu không có file ảnh, xử lý theo nhu cầu của bạn
+        image = '/default/image/path.jpg'; // Đặt đường dẫn mặc định hoặc xử lý theo yêu cầu
+    }
+
     if (
         title == "" ||
         author == "" ||
         price == "" ||
-        image == "" ||
         year == "" ||
         isbn == "" ||
         average_score == "" ||
@@ -68,7 +83,7 @@ exports.addProduct = (req, res, next) => {
     } else {
         const products = new Product({
             title,
-            slugProduct,
+            slugProduct: slug(title),
             author,
             price,
             image,
@@ -80,13 +95,10 @@ exports.addProduct = (req, res, next) => {
             descriptionProduct,
             categoryName,
         });
-        // console.log("Product : ", products);
-        products
-            .save()
+
+        products.save()
             .then((result) => {
                 res.redirect('/admin/product');
-
-
             })
             .catch((err) => {
                 if (!err.statusCode) {
@@ -96,6 +108,7 @@ exports.addProduct = (req, res, next) => {
             });
     }
 };
+
 
 exports.updateProduct = (req, res, next) => {
     console.log(req.body);

@@ -115,9 +115,12 @@ exports.postForgotPassword = (req, res, next) => {
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
-        return res
-          .status(404)
-          .json({ status: false, message: "Email không tồn tại" });
+        return res.send(`
+          <script>
+            alert("Email không tồn tại. Vui lòng kiểm tra lại!");
+            window.location.href = "/forgot-password";
+          </script>
+        `);
       }
 
       // Lưu mã xác nhận vào cơ sở dữ liệu

@@ -40,6 +40,7 @@
                     <th class="pro-price">Price</th>
                     <th class="pro-quantity">Quantity</th>
                     <th class="pro-subtotal">Total</th>
+                 
                   </tr>
                 </thead>
                 <tbody>
@@ -73,6 +74,8 @@
                               </div>
                             </td>
                             <td class="pro-subtotal"><span><%= formatNumber(product.item.price * product.quantity) %></span></td>
+                          
+                    
                     
                           </tr>
                       <% }); %>
