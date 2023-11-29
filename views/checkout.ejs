@@ -1,7 +1,11 @@
 <%- include('layout/header.ejs') %>
   <%- include('layout/navbar.ejs', {categories: categories}) %>
-    <% function formatNumber(num) { if (num==null) { return "0" ; } return
-      num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1," ); } %>
+  <% function formatNumber(num) {
+    if (num == null) {
+      return "0"; 
+     } 
+     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,"); } 
+     %>
       <section class="breadcrumb-section">
         <h2 class="sr-only">Site Breadcrumb</h2>
         <div class="container">
@@ -119,18 +123,20 @@
                           <input type="hidden" name="totalPrice" id="totalPrice" value="<%= totalPrice %>" />
                           <p>Shipping Fee <span>0 VNĐ</span></p>
 
-                          <div className="input-radio">
-                            <input type="radio" className="accent-pink-500" id="vnpay" name="paymentMethod"
-                              value="vnpay" />
-                          </div>
-                          <label htmlFor="vnpay" className="text-[17px] text-normal text-black">
-                            Thanh Toán VnPay
-                          </label>
+                          <br>
+                          <div>
+                            <input type="radio" style="height: 15px; width: 30px;padding-right: 20px;" id="vnpay"
+                              name="paymentMethod" value="vnpay" />
 
-                          <div className="input-radio">
-                            <input type="radio" className="accent-pink-500" id="delivery" name="paymentMethod"
-                              value="delivery" />
+                            <label htmlFor="vnpay" className="text-[17px] text-normal text-black">
+                              Thanh Toán VnPay
+                            </label>
                           </div>
+
+
+
+                          <input type="radio" style="height: 15px; width: 30px;" id="delivery" name="paymentMethod"
+                            value="delivery" />
                           <label htmlFor="delivery" className="text-[17px] text-normal text-black">
                             Thanh Toán Khi Giao Hàng
                           </label>
