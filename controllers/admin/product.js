@@ -44,9 +44,6 @@ exports.listProduct = async (req, res, next) => {
     }
 };
 
-
-
-
 exports.addProduct = (req, res, next) => {
     let title = req.body.title;
     let author = req.body.author;
@@ -111,12 +108,10 @@ exports.addProduct = (req, res, next) => {
 
 
 exports.updateProduct = (req, res, next) => {
-    console.log(req.body);
     let productId = req.params.productId;
     let title = req.body.title;
     let author = req.body.author;
     let price = req.body.price;
-    let image = req.body.image;
     let year = req.body.year;
     let isbn = req.body.isbn;
     let average_score = req.body.average_score;
@@ -124,21 +119,32 @@ exports.updateProduct = (req, res, next) => {
     let descriptionProduct = req.body.descriptionProduct;
     let categoryName = req.body.categoryName;
     let slugProduct = slug(title);
+    
     Product.findById(productId)
         .then((data) => {
-            data.title = title;
-            data.author = author;
-            data.price = price;
-            data.image = image;
-            data.year = year;
-            data.isbn = isbn;
-            data.average_score = average_score;
-            data.describeProduct = describeProduct;
-            data.descriptionProduct = descriptionProduct;
-            data.categoryName = categoryName;
-            data.slugProduct = slugProduct;
+            // Chỉ cập nhật các trường nếu chúng được cung cấp
+            if (title) data.title = title;
+            if (author) data.author = author;
+            if (price) data.price = price;
+            if (year) data.year = year;
+            if (isbn) data.isbn = isbn;
+            if (average_score) data.average_score = average_score;
+            if (describeProduct) data.describeProduct = describeProduct;
+            if (descriptionProduct) data.descriptionProduct = descriptionProduct;
+            if (categoryName) data.categoryName = categoryName;
+            if (title) data.slugProduct = slugProduct;
+
+            let newImage;
+            if (req.file) {
+                newImage = '/uploads/' + req.file.filename;
+                // Cập nhật data.image với đường dẫn hình ảnh mới
+                data.image = newImage;
+            }
+
             return data.save();
+            
         })
+        
         .then((result) => {
             res.redirect('/admin/product');
         })
@@ -148,7 +154,9 @@ exports.updateProduct = (req, res, next) => {
             }
             next(err);
         });
+      
 };
+
 
 exports.deleteProduct = (req, res, next) => {
     const productId = req.params.productId;
