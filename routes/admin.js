@@ -21,6 +21,8 @@ const upload = multer({ storage: storage });
 
 
 
+
+
 // phân quyền
 async function requireAdmin(req, res, next) {
   const sessionEmail = req.session.email;
@@ -91,6 +93,7 @@ router.post("/addProduct", requireAdmin, upload.single('image'), productControll
 router.post(
   "/updateProduct/:productId",
   requireAdmin,
+  upload.single('image'),
   productController.updateProduct
 );
 router.post(

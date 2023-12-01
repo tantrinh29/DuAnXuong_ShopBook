@@ -2,6 +2,7 @@ const random = require("random-token");
 const Product = require("../models/product");
 const Comment = require("../models/comment");
 const Order = require("../models/order");
+const Cart = require("../models/cart");
 const User = require("../models/user");
 const Category = require("../models/category");
 const VnPayModel = require("../models/vnpay");
@@ -20,6 +21,7 @@ exports.getDetail = async (req, res) => {
   try {
     const slug = req.params.slug;
     const product = await Product.findOne({ slugProduct: slug });
+    const products = await Product.find({});
     const categories = await Category.find({});
     const comments = await Comment.find({
       slugProduct: slug, // Bình luận theo slug của sản phẩm
@@ -30,6 +32,7 @@ exports.getDetail = async (req, res) => {
       detailProducts: product,
       comments: comments,
       categories: categories,
+      products: products,
     });
   } catch (error) {
     console.log(error);
@@ -231,6 +234,8 @@ exports.addToCart = (req, res) => {
     });
 };
 
+
+
 exports.viewCart = async (req, res) => {
   const categories = await Category.find({});
 
@@ -259,6 +264,7 @@ exports.viewCart = async (req, res) => {
     totalPrice: cart.totalPrice,
   });
 };
+
 
 exports.updateCart = (req, res) => {
   const { idProduct, quantity } = req.body;
