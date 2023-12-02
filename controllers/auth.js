@@ -74,7 +74,7 @@ exports.loginUser = (req, res, next) => {
             message: "Có lỗi xảy ra trong quá trình đăng nhập",
           });
         }
-        console.log("Kết quả của bcrypt.compare:", result);
+        
 
         if (result) {
           req.session.loggedin = true;
@@ -138,19 +138,28 @@ exports.postForgotPassword = (req, res, next) => {
       });
 
       const mailOptions = {
-        from: "dinhtrinh5678@gmail.com",
+        from: "your-email@example.com",
         to: email,
-        subject: "Đặt lại mật khẩu",
-        html: `<p>Nhấn vào <a href="http://localhost:3333/reset-password/${resetToken}">đây</a> để đặt lại mật khẩu.</p>`,
+        subject: "Khôi phục mật khẩu",
+        html: `
+          <p>Xin chào,</p>
+          <p>Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn.</p>
+          <p>Vui lòng nhấn vào đường link dưới đây để tiếp tục quá trình đặt lại mật khẩu:</p>
+          <p><a href="http://localhost:3333/reset-password/${resetToken}">Đặt lại mật khẩu</a></p>
+          <p>Nếu bạn không thực hiện yêu cầu này, bạn có thể bỏ qua thư này.</p>
+          <p>Trân trọng,</p>
+          <p>Đội ngũ hỗ trợ của chúng tôi</p>
+        `,
       };
+      
 
       return transporter.sendMail(mailOptions);
     })
     .then((info) => {
       res.send(`
       <script>
-        alert("Email đã được gửi với hướng dẫn đặt lại mật khẩu. Đang chuyển hướng đến Gmail...");
-        window.location.href = "https://mail.google.com/";
+        alert("Email đã được gửi với hướng dẫn đặt lại mật khẩu. Vui lòng kiểm tra email");
+        window.location.href = "http://localhost:3333/forgot-password";
       </script>
     `);
     })
@@ -159,6 +168,7 @@ exports.postForgotPassword = (req, res, next) => {
       res.status(500).json({ status: false, message: "Có lỗi xảy ra" });
     });
 };
+
 
 exports.getResetPassword = (req, res, next) => {
   const resetToken = req.params.resetToken;

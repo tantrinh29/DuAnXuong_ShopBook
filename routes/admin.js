@@ -88,7 +88,7 @@ router.post("/deleteCategory/:cateId", categoryController.deleteCategory);
 // ====================== product  ====================== //
 router.get("/product", requireAdmin, productController.listProduct);
 
-router.post("/addProduct", requireAdmin, upload.single('image'), productController.addProduct);
+router.post("/addProduct", requireAdmin, upload.single('image1'), productController.addProduct);
 
 router.post(
   "/updateProduct/:productId",
