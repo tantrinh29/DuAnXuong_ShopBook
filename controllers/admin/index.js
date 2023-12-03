@@ -152,23 +152,37 @@ exports.getDetailOrder = (req, res, next) => {
 };
 
 exports.updateOrder = (req, res, next) => {
-    const idOrder = req.params.id;
-    Order.findById(idOrder)
-        .then((huyit) => {
-            huyit.status = "Delivering";
-            return huyit.save();
-        })
-        .then((result) => {
-            res.status(200).json({
-                status: true,
-                message: "Giao Hàng Thành Công",
-            });
-        })
-        .catch((err) => {
-            if (!err.statusCode) {
-                err.statusCode = 500;
-            }
-            next(err);
-        });
+  const idOrder = req.params.id;
+  Order.findById(idOrder)
+      .then((order) => {
+          if (!order) {
+              const error = new Error("Đơn hàng không tồn tại");
+              error.statusCode = 404;
+              throw error;
+          }
+
+          // Kiểm tra trạng thái đơn hàng
+          if (order.status !== 'Processed') {
+              return res.status(400).json({
+                  status: false,
+                  message: 'Không thể giao hàng cho đơn hàng này.'
+              });
+          }
+
+          order.status = "Delivering";
+          return order.save();
+      })
+      .then((result) => {
+          res.status(200).json({
+              status: true,
+              message: "Đang giao hàng đến khác hàng",
+          });
+      })
+      .catch((err) => {
+          if (!err.statusCode) {
+              err.statusCode = 500;
+          }
+          next(err);
+      });
 };
 
