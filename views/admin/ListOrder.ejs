@@ -42,9 +42,10 @@
                   <td style = "font-weight:bold" <% if (order.status === 'Processed') { %>color: red; <% } else if (order.status === 'Delivering') { %>color: #d51ac0;<% } else { %>color: #66CC33;<% } %>"><%= order.status %></td>
 
                   <td><%= formatNumber(order.totalPrice) %></td>
+                  <div id="notification"></div>
                   <td>
                     <% if(order.status == 'Processed') { %>
-                      <a href="/admin/updateOrder/<%= order._id %>" class="btn btn-danger text-light">Giao Hàng</a>
+                      <a href="#" class="btn btn-danger text-light" onclick="deliverOrder('<%= order._id %>')">Giao Hàng</a>
                     <% } else if(order.status == 'Complete') {  %>
                       <button class='btn btn-success' disabled">Khách Hàng Đã Nhận</button>
                     <% } else { %>
@@ -71,5 +72,31 @@
   $(function () {
     $("#datatable1").DataTable();
   });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+  function deliverOrder(orderId) {
+    $.ajax({
+      url: `/admin/updateOrder/${orderId}`,
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        // Hiển thị thông báo
+        const notificationDiv = $('#notification');
+        notificationDiv.html(`<p>${data.message}</p>`);
+
+        // Hiển thị cảnh báo khi giao hàng thành công
+        alert(data.message);
+
+        // Tự động làm mới trang sau một khoảng thời gian (ví dụ: 1 giây)
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      },
+      error: function(error) {
+        console.error('Lỗi khi giao hàng:', error);
+      }
+    });
+  }
 </script>
 <%- include('_layout/footer.ejs') %>
