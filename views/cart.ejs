@@ -98,16 +98,22 @@
                             <td class="pro-price"><span><%= formatNumber(product.item.price) %></span></td>
                             <td class="pro-quantity">
                               <div class="pro-qty">
-                                <div class="count-input-block">
-                                    <input type="hidden" id="idProduct_<%= product.item._id %>" value="<%= product.item._id %>">
+                                <div class="count-input-block" style="display: flex; justify-content: center;">
+                                  <input type="hidden" id="idProduct_<%= product.item._id %>" value="<%= product.item._id %>">
+                                  <button class="qty-btn" onclick="decreaseQuantity('<%= product.item._id %>')"><a style="margin-right: 10px;" >─</a></button>
                                   <input
                                     type="number"
                                     id="quantity_<%= product.item._id %>"
                                     class="form-control text-center"
+                                    style="border-radius: 10px; border-color: rgb(22, 146, 68);"
                                     value="<%= product.quantity %>"
+                                    readonly
                                   />
+                                  <button class="qty-btn" style="margin-left: 10px;" onclick="increaseQuantity('<%= product.item._id %>')">✚</button>
                                 </div>
                               </div>
+                              
+                              
                             </td>
                             <td class="pro-subtotal"><span><%= formatNumber(product.item.price * product.quantity) %></span></td>
                             <td><button
@@ -180,6 +186,21 @@
     </div>
   </div>
 </main>
+<script>
+  function increaseQuantity(productId) {
+    var quantityInput = document.getElementById("quantity_" + productId);
+    var currentQuantity = parseInt(quantityInput.value);
+    quantityInput.value = currentQuantity + 1;
+  }
+
+  function decreaseQuantity(productId) {
+    var quantityInput = document.getElementById("quantity_" + productId);
+    var currentQuantity = parseInt(quantityInput.value);
+    if (currentQuantity > 1) {
+      quantityInput.value = currentQuantity - 1;
+    }
+  }
+</script>
 
 <!-- Cart Page End -->
 <%- include('layout/footer.ejs') %>
