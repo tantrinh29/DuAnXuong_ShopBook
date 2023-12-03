@@ -37,7 +37,7 @@ router.get(
   indexController.getStatusComplete
 );
 
-router.get("/categories/:slug", indexController.getProductOfCategory);
+router.get("/categories/:slug", indexController.getProductOfCategory);  
 
 router.get("/register", async (req, res, next) => {
   const categories = await Category.find({});
@@ -49,9 +49,16 @@ router.get("/login", async (req, res, next) => {
   res.render("auth/login", { categories: categories });
 });
 
-router.get("/forgot-password", userController.getForgotPassword);
+router.get("/forgot-password", async (req, res, next) => {
+  const categories = await Category.find({});
+  res.render("auth/forgot-password", {categories: categories});
+});
 router.post("/forgot-password", userController.postForgotPassword);
-router.get("/reset-password", userController.getResetPassword);
+
+router.get("/reset-password", async (req, res, next) => {
+  const categories = await Category.find({});
+  res.render("auth/reset-password", {categories: categories});
+});
 router.get("/reset-password/:resetToken", userController.getResetPassword);
 router.post("/reset-password", userController.postResetPassword);
 
