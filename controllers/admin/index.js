@@ -1,6 +1,7 @@
 const Order = require("../../models/order");
 const Product = require("../../models/product");
 const Users = require("../../models/user");
+const ExcelJS = require('exceljs');
 exports.getAdmin = async (req, res) => {
     function formatNumber(num) {
         if (num == null) {
@@ -66,9 +67,11 @@ exports.updateUser = (req, res, next) => {
             next(err);
         });
 };
+
+
+
 // list order
 exports.getListOrder = (req, res) => {
-
   Order.find({})
     .then((order) => {
       res.render("admin/ListOrder", { orders: order  });
@@ -88,6 +91,46 @@ exports.getDetailOrder = (req, res, next) => {
       console.log(err);
     });
 };
+
+
+exports.exportExcel = (req, res, next) => {
+  const codeOrder = req.params.codeOrder;
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Chi tiết đơn hàng');
+  const columExcel = [
+    { header: 'STT', key: 'id', width: 20 },
+    { header: 'Mã đơn hàng', key: 'codeOrder', width: 10 },
+    { header: 'Tên sản phẩm', key: 'title', width: 20 },
+    { header: 'Số lượng', key: 'quantity', width: 15 },
+    { header: 'Đơn giá', key: 'price', width: 15 },
+    { header: 'Thành tiền', key: 'total', width: 15 },
+    { header: 'Ghi chú', key: 'comment', width: 15 },
+  ];
+  Order.findOne({ codeOrder: codeOrder })
+    .then((detailOrder) => {
+      worksheet.columns = columExcel
+      detailOrder?.products?.forEach((itemRow, index) => {
+        let total = itemRow?.item.price * itemRow?.quantity
+        worksheet.addRow({
+          id: ++index,
+          codeOrder: detailOrder?.codeOrder,
+          title: itemRow?.item?.title,
+          quantity: itemRow?.quantity,
+          price: itemRow?.item?.price,
+          total: total,
+          comment: detailOrder?.comment
+        })
+      })
+      
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent('Chi tiết đơn hàng')}.xlsx"`);
+      return workbook.xlsx.write(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
 
 // update status order
 exports.updateOrder = (req, res, next) => {
@@ -137,38 +180,3 @@ exports.deleteOrder = (req, res, next) => {
     next(err);
   });
 };
-
- 
-exports.getDetailOrder = (req, res, next) => {
-    const codeOrder = req.params.codeOrder;
-    Order.findOne({ codeOrder: codeOrder })
-        .then((huydev) => {
-            res.render("admin/DetailOrder", { detailOrders: huydev });
-            console.log(huydev);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-};
-
-exports.updateOrder = (req, res, next) => {
-    const idOrder = req.params.id;
-    Order.findById(idOrder)
-        .then((huyit) => {
-            huyit.status = "Delivering";
-            return huyit.save();
-        })
-        .then((result) => {
-            res.status(200).json({
-                status: true,
-                message: "Giao Hàng Thành Công",
-            });
-        })
-        .catch((err) => {
-            if (!err.statusCode) {
-                err.statusCode = 500;
-            }
-            next(err);
-        });
-};
-

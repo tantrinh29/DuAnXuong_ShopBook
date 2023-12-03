@@ -84,18 +84,17 @@ router.post(
 
 // ====================== list orders  ====================== //
 
-router.get("/listOrder", requireAdmin, indexController.getListOrder);
+router.get("/listOrder",requireAdmin,   indexController.getListOrder);
 router.get(
-  "/detailOrder/:codeOrder",
-  requireAdmin,
+  "/detailOrder/:codeOrder",requireAdmin, 
   indexController.getDetailOrder
 );
+router.get("/exportExcel/:codeOrder",requireAdmin, indexController.exportExcel
+);
 
-router.post("/updateOrder/:id",  indexController.updateOrder);
-router.post("/deleteOrder/:id", indexController.deleteOrder);
-=======
+router.post("/updateOrder/:id", requireAdmin,  indexController.updateOrder);
+router.post("/deleteOrder/:id",requireAdmin,  indexController.deleteOrder);
 
-router.get("/updateOrder/:id", requireAdmin, indexController.updateOrder);
 
 // ====================== Comment ========================= //
 
