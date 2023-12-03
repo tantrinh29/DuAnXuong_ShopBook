@@ -32,10 +32,7 @@ const postSchema = new Schema(
       type: String,
       required: true,
     },
-    average_score: {
-      type: String,
-      required: true,
-    },
+    
     image: {
       type: String,
       required: true,

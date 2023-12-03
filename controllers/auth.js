@@ -56,6 +56,7 @@ exports.loginUser = (req, res, next) => {
       .json({ status: false, message: "Không Được Để Trống" });
   }
 
+  
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
@@ -74,12 +75,12 @@ exports.loginUser = (req, res, next) => {
             message: "Có lỗi xảy ra trong quá trình đăng nhập",
           });
         }
-        console.log("Kết quả của bcrypt.compare:", result);
-
+        
         if (result) {
           req.session.loggedin = true;
           req.session.email = email;
           res.locals.email = email;
+          req.session.userID = user._id;
           console.log(res.locals.email);
           return res.status(200).json({
             status: true,
@@ -138,27 +139,49 @@ exports.postForgotPassword = (req, res, next) => {
       });
 
       const mailOptions = {
-        from: "dinhtrinh5678@gmail.com",
+        from: "Cửa hàng BookShop <dinhtrinh5678@gmail.com>",
         to: email,
-        subject: "Đặt lại mật khẩu",
-        html: `<p>Nhấn vào <a href="http://localhost:3333/reset-password/${resetToken}">đây</a> để đặt lại mật khẩu.</p>`,
+        subject: "Khôi phục mật khẩu",
+        html: `
+        <p>Xin chào,</p>
+        <p>Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản của bạn.</p>
+        <p>Vui lòng nhấn vào nút dưới đây để tiếp tục quá trình đặt lại mật khẩu:</p>
+        <button style="background-color: #4CAF50; /* Green */
+          border: none;
+          color: white;
+          padding: 15px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 13px;
+          border-radius:15px;"
+        >
+          <a href="http://localhost:3333/reset-password/${resetToken}" style="color: white; text-decoration: none;">
+            Đặt lại mật khẩu
+          </a>
+        </button>
+        <p>Nếu bạn không thực hiện yêu cầu này, bạn có thể bỏ qua thư này.</p>
+        <p>Trân trọng,</p>
+        <p>Đội ngũ hỗ trợ của chúng tôi</p>
+        
+        `,
       };
+      
 
       return transporter.sendMail(mailOptions);
     })
     .then((info) => {
-      res.send(`
-      <script>
-        alert("Email đã được gửi với hướng dẫn đặt lại mật khẩu. Đang chuyển hướng đến Gmail...");
-        window.location.href = "https://mail.google.com/";
-      </script>
-    `);
+      res.status(200).json({
+        status: true,
+        message: "Email đã được gửi với hướng dẫn đặt lại mật khẩu. Vui lòng kiểm tra email"
+      });
     })
     .catch((err) => {
       console.error(err);
       res.status(500).json({ status: false, message: "Có lỗi xảy ra" });
     });
 };
+
 
 exports.getResetPassword = (req, res, next) => {
   const resetToken = req.params.resetToken;
@@ -206,14 +229,11 @@ exports.postResetPassword = (req, res, next) => {
     .then((updatedUser) => {
       console.log(updatedUser)
       if (!updatedUser) {
-        return res
-          .status(400)
-          .json({ status: false, message: "Mã xác nhận không hợp lệ" });
+        return res.status(400).json({ status: false, message: "Mã xác nhận không hợp lệ" });
       }
-
+    
       // Gửi phản hồi thành công
-      const script = `<script>alert("Đặt mật khẩu Thành Công"); window.location.href = '/login';</script>`;
-      res.status(200).send(script);
+      res.status(200).json({ status: true, message: "Đặt mật khẩu thành công" });
     })
     .catch((err) => {
       console.error(err);

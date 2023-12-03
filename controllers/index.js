@@ -5,6 +5,7 @@ const Order = require("../models/order");
 const User = require("../models/user");
 const Category = require("../models/category");
 const VnPayModel = require("../models/vnpay");
+const Cart = require("../models/cart");
 
 exports.getIndex = async (req, res) => {
   try {
@@ -91,7 +92,7 @@ exports.postComment = async (req, res) => {
         comment
           .save()
           .then((result) => {
-            // console.log(result);
+            
             res.json({ status: true, message: "Bình Luận Thành Công" });
           })
           .catch((error) => {
@@ -189,202 +190,272 @@ exports.deleteComment = (req, res) => {
 
 // add to cart
 
-exports.addToCart = (req, res) => {
-  const slug = req.body.slugProduct;
-  const quantity = Number(req.body.quantity || 1);
+exports.addToCart = async (req, res) => {
+  try {
+    const slug = req.body.slugProduct;
+    const quantity = Number(req.body.quantity || 1);
 
-  Product.findOne({ slugProduct: slug })
-    .then((product) => {
-      if (!product) {
-        return res.status(400).json({ message: "Không tìm thấy sản phẩm" });
-      }
+    // Tìm sản phẩm trong cơ sở dữ liệu
+    const product = await Product.findOne({ slugProduct: slug });
 
-      let cart = req.session.cart;
-      // Nếu giỏ hàng không tồn tại thì tạo mới
-      if (!cart) {
-        cart = { huydev: {}, totalQuantity: 0, totalPrice: 0 };
-      }
-      // +1 và đoạn này khó
-      if (cart.huydev[product._id]) {
-        cart.huydev[product._id].quantity += quantity;
-        cart.totalQuantity += quantity;
-        cart.totalPrice += Number(product.price) * quantity;
-      } else {
-        // Thêm mới sản phẩm vào giỏ hàng
-        cart.huydev[product._id] = {
-          item: product,
-          quantity: quantity,
-        };
-        cart.totalQuantity += quantity;
-        cart.totalPrice += Number(product.price) * quantity;
-      }
-      req.session.cart = cart;
-      return res.status(200).json({
-        status: true,
-        message: "Thêm Sản Phẩm Thành Công",
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json({
-        status: false,
-        message: "Thêm Sản Phẩm Thất Bại",
-      });
+    if (!product) {
+      return res.status(400).json({ message: "Không tìm thấy sản phẩm" });
+    }
+
+    // Tìm sản phẩm trong giỏ hàng cơ sở dữ liệu
+    const cartItem = await Cart.findOne({
+      product_id: product._id,
+      user_id: req.session.userID, // Đảm bảo rằng bạn có session với userID
     });
+
+    if (cartItem) {
+      // Nếu sản phẩm đã tồn tại trong giỏ hàng, cập nhật số lượng
+      cartItem.quantity += quantity;
+      await cartItem.save();
+    } else {
+      // Nếu sản phẩm chưa tồn tại trong giỏ hàng, tạo mới
+      await Cart.create({
+        product_id: product._id,
+        user_id: req.session.userID,
+        quantity: quantity,
+      });
+    }
+
+    // Cập nhật giỏ hàng trong phiên
+    let cart = req.session.cart || {
+      huydev: {},
+      totalQuantity: 0,
+      totalPrice: 0,
+    };
+
+    if (cart.huydev[product._id]) {
+      // Nếu sản phẩm đã tồn tại trong giỏ hàng phiên, cập nhật số lượng
+      cart.huydev[product._id].quantity += quantity;
+      cart.totalQuantity += quantity;
+      cart.totalPrice += Number(product.price) * quantity;
+    } else {
+      // Nếu sản phẩm chưa tồn tại trong giỏ hàng phiên, thêm mới
+      cart.huydev[product._id] = {
+        item: product,
+        quantity: quantity,
+      };
+      cart.totalQuantity += quantity;
+      cart.totalPrice += Number(product.price) * quantity;
+    }
+
+    req.session.cart = cart;
+
+    return res.status(200).json({
+      status: true,
+      message: "Thêm Sản Phẩm Thành Công",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      status: false,
+      message: "Thêm Sản Phẩm Thất Bại",
+    });
+  }
 };
 
 exports.viewCart = async (req, res) => {
-  const categories = await Category.find({});
+  try {
+    const categories = await Category.find({});
+    const userCart = await Cart.find({ user_id: req.session.userID })
+      .populate("product_id")
+      .exec();
 
-  const cart = req.session.cart;
-
-  if (!cart) {
-    return res.render("cart", {
-      products: [],
-      totalPrice: 0,
-      categories: categories,
-    });
-  }
-
-  const products = [];
-  for (const key in cart.huydev) {
-    products.push(cart.huydev[key]);
-  }
-
-  res.locals.products = products;
-  req.session.totalPrice = cart.totalPrice;
-  res.locals.totalPrice = cart.totalPrice;
-  console.log(products);
-  return res.render("cart", {
-    categories: categories,
-    products: products,
-    totalPrice: cart.totalPrice,
-  });
-};
-
-exports.updateCart = (req, res) => {
-  const { idProduct, quantity } = req.body;
-  const carts = req.session.cart;
-
-  if (!carts) {
-    return res.status(200).json({
-      status: false,
-      message: "Không Có Sản Phẩm Nào Ở Đây Huy Nha",
-    });
-  } else {
-    const cartItems = Object.keys(carts.huydev);
-    let totalQuantity = 0;
-    let totalPrice = 0;
-
-    // sản phẩm có id trùng với id được truyền vào
-    for (let itemId of cartItems) {
-      const productToUpdate = carts.huydev[itemId];
-      console.log("Item : ", carts.huydev);
-      console.log("Item ID", itemId);
-      if (itemId == idProduct) {
-        productToUpdate.quantity = quantity;
-        totalQuantity += parseInt(quantity);
-        totalPrice += parseInt(productToUpdate.item.price) * parseInt(quantity);
-      } else {
-        totalQuantity += parseInt(productToUpdate.quantity);
-        totalPrice +=
-          parseInt(productToUpdate.item.price) *
-          parseInt(productToUpdate.quantity);
-      }
+    if (!userCart || userCart.length === 0) {
+      return res.render("cart", {
+        products: [],
+        totalPrice: 0,
+        categories: categories,
+      });
     }
 
-    // Update Money Quantity
-    carts.totalQuantity = totalQuantity;
-    carts.totalPrice = totalPrice;
+    const products = userCart.map((cartItem) => {
+      return {
+        item: cartItem.product_id,
+        quantity: cartItem.quantity,
+      };
+    });
+
+    const totalPrice = products.reduce((total, product) => {
+      return total + product.item.price * product.quantity;
+    }, 0);
+
+    res.locals.products = products;
+    res.locals.totalPrice = totalPrice;
+
+    return res.render("cart", {
+      categories: categories,
+      products: products,
+      totalPrice: totalPrice,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: false,
+      message: "Lỗi khi hiển thị giỏ hàng",
+    });
+  }
+};
+
+exports.updateCart = async (req, res) => {
+  try {
+    const { idProduct, quantity } = req.body;
+
+    // Tìm sản phẩm trong cơ sở dữ liệu
+    const product = await Product.findById(idProduct);
+
+    if (!product) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Không tìm thấy sản phẩm" });
+    }
+
+    // Cập nhật sản phẩm trong cơ sở dữ liệu
+    const cartItem = await Cart.findOneAndUpdate(
+      { product_id: product._id, user_id: req.session.userID },
+      { $set: { quantity: quantity } },
+      { new: true }
+    );
+
+    // Cập nhật sản phẩm trong phiên
+    let cart = req.session.cart || {
+      huydev: {},
+      totalQuantity: 0,
+      totalPrice: 0,
+    };
+
+    if (cart.huydev[product._id]) {
+      cart.huydev[product._id].quantity = quantity;
+      cart.totalQuantity += parseInt(quantity);
+      cart.totalPrice += Number(product.price) * parseInt(quantity);
+    }
+
+    req.session.cart = cart;
 
     return res.status(200).json({
       status: true,
       message: `Cập Nhật Sản Phẩm Với ID [${idProduct}] Thành Công`,
     });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      status: false,
+      message: "Lỗi khi cập nhật giỏ hàng",
+    });
   }
 };
 
-exports.deleteCart = (req, res) => {
-  const { deleteIDProduct } = req.body;
-  const carts = req.session.cart;
+exports.deleteCart = async (req, res) => {
+  try {
+    const { deleteIDProduct } = req.body;
 
-  if (!carts) {
-    return res.status(200).json({
-      status: false,
-      message: "Không Có Sản Phẩm Nào Ở Đây Huy Nha",
-    });
-  } else {
-    const cartItems = Object.keys(carts.huydev);
+    // Tìm sản phẩm trong cơ sở dữ liệu
+    const product = await Product.findById(deleteIDProduct);
 
-    for (let itemId of cartItems) {
-      if (itemId == deleteIDProduct) {
-        const productToDelete = carts.huydev[itemId];
-        carts.totalPrice -=
-          productToDelete.item.price * productToDelete.quantity;
-        carts.totalQuantity -= productToDelete.quantity;
-        delete carts.huydev[itemId];
-
-        return res.status(200).json({
-          status: true,
-          message: `Xóa Sản Phẩm Với ID [${deleteIDProduct}] Thành Công`,
-        });
-      }
+    if (!product) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Không tìm thấy sản phẩm" });
     }
+
+    // Xóa sản phẩm trong cơ sở dữ liệu
+    await Cart.findOneAndDelete({
+      product_id: product._id,
+      user_id: req.session.userID,
+    });
+
+    // Xóa sản phẩm trong phiên
+    let cart = req.session.cart || {
+      huydev: {},
+      totalQuantity: 0,
+      totalPrice: 0,
+    };
+
+    if (cart.huydev[product._id]) {
+      cart.totalPrice -= product.price * cart.huydev[product._id].quantity;
+      cart.totalQuantity -= cart.huydev[product._id].quantity;
+      delete cart.huydev[product._id];
+    }
+
+    req.session.cart = cart;
 
     return res.status(200).json({
       status: true,
-      message: `Xóa Sản Phẩm Thất Bại`,
+      message: `Xóa Sản Phẩm Với ID [${deleteIDProduct}] Thành Công`,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      status: false,
+      message: "Lỗi khi xóa sản phẩm từ giỏ hàng",
     });
   }
 };
 
-// show view session cart
+// show view
 
 exports.getviewCheckOut = async (req, res) => {
-  const categories = await Category.find({});
+  try {
+    const categories = await Category.find({});
+    const user = await User.findOne({ email: req.session.email });
 
-  const cart = req.session.cart;
-  const email = req.session.email;
+    if (!user) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Không tìm thấy người dùng" });
+    }
 
-  if (!cart) {
-    return res.render("checkout", {
-      products: [],
-      userOrder: {},
-      totalPrice: 0,
+    const userOrder = {
+      fullname: user.fullname,
+      email: user.email,
+    };
+
+    const cart = await Cart.find({ user_id: user._id })
+      .populate("product_id")
+      .exec();
+
+    if (!cart || cart.length === 0) {
+      return res.render("checkout", {
+        categories: categories,
+        products: [],
+        userOrder: userOrder,
+        totalPrice: 0,
+      });
+    }
+
+    const products = cart.map((cartItem) => {
+      return {
+        item: cartItem.product_id,
+        quantity: cartItem.quantity,
+      };
+    });
+
+    const totalPrice = products.reduce((total, product) => {
+      return total + product.item.price * product.quantity;
+    }, 0);
+
+    res.render("checkout", {
       categories: categories,
+      products: products,
+      userOrder: userOrder,
+      totalPrice: totalPrice,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: false,
+      message: "Lỗi khi lấy thông tin đơn hàng từ cơ sở dữ liệu",
     });
   }
-
-  User.findOne({ email: email })
-    .then((user) => {
-      const userOrder = {
-        fullname: user.fullname,
-        email: user.email,
-      };
-
-      const products = [];
-      if (cart && cart.huydev && Object.keys(cart.huydev).length !== 0) {
-        for (const key in cart.huydev) {
-          products.push(cart.huydev[key]);
-        }
-      }
-
-      res.render("checkout", {
-        categories: categories,
-        products: products,
-        totalPrice: cart.totalPrice,
-        userOrder: userOrder,
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
 };
 
 // odder
 
 const createVnpayPayment = async (orderData) => {
-
   try {
     const result = await VnPayModel.create({
       vnp_Amount: orderData.vnp_Amount,
@@ -402,7 +473,6 @@ const createVnpayPayment = async (orderData) => {
 const createOrder = async (
   email,
   productsList,
-  cart,
   vnpayID,
   paymentMethod,
   address,
@@ -410,11 +480,15 @@ const createOrder = async (
   comment
 ) => {
   try {
+    const totalPrice = productsList.reduce((total, product) => {
+      return total + product.item.price * product.quantity;
+    }, 0);
+
     const orderData = new Order({
       emailOrder: email,
       codeOrder: random(5).toUpperCase(),
       products: productsList,
-      totalPrice: cart.totalPrice || 0,
+      totalPrice: totalPrice,
       status: "Processed",
       paymentMethod: paymentMethod,
       vnpayID: vnpayID,
@@ -428,11 +502,32 @@ const createOrder = async (
     throw error;
   }
 };
+
 exports.orderCart = async (req, res) => {
-  const { email, cart, address, phone, comment } = req.session;
-  console.log(req.body);
+  const { email, address, phone, comment } = req.session;
   try {
-    const productsList = Object.values(cart.huydev);
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Không tìm thấy người dùng" });
+    }
+
+    const cart = await Cart.find({ user_id: user._id })
+      .populate("product_id")
+      .exec();
+
+    if (!cart || cart.length === 0) {
+      return res.status(400).json({ status: false, message: "Giỏ hàng rỗng" });
+    }
+
+    const productsList = cart.map((cartItem) => {
+      return {
+        item: cartItem.product_id,
+        quantity: cartItem.quantity,
+      };
+    });
+
     const vnpayID =
       req.body.paymentMethod === "vnpay"
         ? await createVnpayPayment({
@@ -441,10 +536,10 @@ exports.orderCart = async (req, res) => {
             vnp_BankTranNo: req.body.vnpTransactionNo,
           })
         : null;
+
     await createOrder(
       email,
       productsList,
-      cart,
       vnpayID,
       req.body.paymentMethod,
       address,
@@ -453,15 +548,15 @@ exports.orderCart = async (req, res) => {
     );
 
     // Xóa giỏ hàng sau khi đặt hàng thành công
-    req.session.cart = {};
-    
+    await Cart.deleteMany({ user_id: user._id });
+
     return res.status(200).json({
       status: true,
       message: `Đặt Hàng Với Email [${email}] Thành Công`,
     });
   } catch (error) {
     console.log(error);
-    return res.status(200).json({
+    return res.status(500).json({
       status: false,
       message: `Đã có lỗi xảy ra trong quá trình đặt hàng.`,
     });
@@ -480,7 +575,7 @@ exports.getListOrder = async (req, res) => {
       //   console.log("Giá:", product.item.price * product.quantity);
       // });
       res.render("listOrder", { orders: order, categories: categories });
-      console.log(order);
+      
     })
     .catch((err) => {
       console.log(err);
@@ -497,7 +592,7 @@ exports.getDetailOrder = async (req, res, next) => {
         detailOrders: huydev,
         categories: categories,
       });
-      console.log(huydev);
+      
     })
     .catch((err) => {
       console.log(err);

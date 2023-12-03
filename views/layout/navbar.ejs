@@ -42,13 +42,18 @@
 
             <div class="cart-block">
               <div class="cart-total">
-                <span class="text-number">
-                   <% if(locals.huyitem.length > 0) { %>
-                        <%= locals.huyitem.length %>
-                    <% } else { %>
-                      0
-                    <% } %>
-                 </span>
+               <span class="text-number">
+  <% if (typeof locals !== 'undefined' && locals.products && locals.products.length > 0) { %>
+    <%= locals.products.reduce((total, product) => {
+      const productQuantity = parseInt(product.quantity, 10) || 0;
+      return total + productQuantity;
+    }, 0) %>
+  <% } else { %>
+    0
+  <% } %>
+</span>
+
+                
                 <span class="text-item"> Shopping Cart </span>
                 <span class="price">
                   <% if(typeof locals !== 'undefined' && locals.huyitem && locals.huyitem.length > 0) { %>
@@ -60,31 +65,6 @@
                 </span>
               </div>
               <div class="cart-dropdown-block">
-                <div class="single-cart-block">
-                  <% if (typeof locals !== 'undefined' && locals.huyitem && locals.huyitem.length > 0) { %> 
-                    <% locals.huyitem.forEach(function(product) { %>
-                  <div class="cart-product">
-                    <a href="#" class="image">
-                      <img
-                        src="<%= product.item.image %>"
-                        alt="<%= product.item.title %>"
-                      />
-                    </a>
-                    <div class="content">
-                      <h3 class="title">
-                        <a href="#"><%= product.item.title %></a>
-                      </h3>
-                      <p class="price">
-                        <span class="qty"><%= product.quantity %> ×</span> <%=
-                        formatNumber(product.item.price) %>
-                      </p>
-                    </div>
-                  </div>
-                  <% }); %> 
-                  <% } else { %>
-                    <p class="text-center text-danger font-weight-bold">Your cart is empty.</p>
-                  <% } %>
-                </div>
                 <div class="single-cart-block">
                   <div class="btn-block">
                     <a href="/cart" class="btn"
