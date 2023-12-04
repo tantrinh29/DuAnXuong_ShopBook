@@ -508,14 +508,10 @@ exports.orderCart = async (req, res) => {
   try {
     const user = await User.findOne({ email: email });
     if (!user) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Không tìm thấy người dùng" });
+      return res.status(400).json({ status: false, message: "Không tìm thấy người dùng" });
     }
 
-    const cart = await Cart.find({ user_id: user._id })
-      .populate("product_id")
-      .exec();
+    const cart = await Cart.find({ user_id: user._id }).populate("product_id").exec();
 
     if (!cart || cart.length === 0) {
       return res.status(400).json({ status: false, message: "Giỏ hàng rỗng" });
@@ -523,7 +519,7 @@ exports.orderCart = async (req, res) => {
 
     const productsList = cart.map((cartItem) => {
       return {
-        item: cartItem.product_id,
+        item: cartItem.product_id.toObject(),
         quantity: cartItem.quantity,
       };
     });
@@ -537,15 +533,7 @@ exports.orderCart = async (req, res) => {
           })
         : null;
 
-    await createOrder(
-      email,
-      productsList,
-      vnpayID,
-      req.body.paymentMethod,
-      address,
-      phone,
-      comment
-    );
+    await createOrder(email, productsList, vnpayID, req.body.paymentMethod, address, phone, comment);
 
     // Xóa giỏ hàng sau khi đặt hàng thành công
     await Cart.deleteMany({ user_id: user._id });
@@ -562,6 +550,7 @@ exports.orderCart = async (req, res) => {
     });
   }
 };
+
 
 // list order
 exports.getListOrder = async (req, res) => {
@@ -619,3 +608,4 @@ exports.getStatusComplete = (req, res, next) => {
       next(err);
     });
 };
+

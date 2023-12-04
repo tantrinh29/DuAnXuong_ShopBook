@@ -12,7 +12,7 @@
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item active">Detail Cart</li>
+          <li class="breadcrumb-item active">Detail Order</li>
         </ol>
       </nav>
     </div>
@@ -40,56 +40,47 @@
                     <th class="pro-price">Price</th>
                     <th class="pro-quantity">Quantity</th>
                     <th class="pro-subtotal">Total</th>
-                 
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- Product Row -->
-                  <% if (detailOrders) { %>
-                    <% detailOrders.products.forEach((product,huyit) => { %>
-                        <tr>
-                            <td class="pro-remove">
-                                <%= huyit + 1 %>                    
-                            </td>
-                            <td class="pro-thumbnail">
-                              <a href="#"
-                                ><img
-                                  src="<%= product.item.image %>"
-                                  alt="<%= product.item.title %>"
-                              /></a>
-                            </td>
-                            <td class="pro-title"><a href="#"><%= product.item.title %></a></td>
-                            <td class="pro-price"><span><%= formatNumber(product.item.price) %></span></td>
-                            <td class="pro-quantity">
-                              <div class="pro-qty">
-                                <div class="count-input-block">
-                                    <input type="hidden" id="idProduct_<%= product.item._id %>" value="<%= product.item._id %>">
-                                  <input
-                                    type="number"
-                                    id="quantity_<%= product.item._id %>"
-                                    class="form-control text-center"
-                                    value="<%= product.quantity %>"
-                                  />
-                                </div>
-                              </div>
-                            </td>
-                            <td class="pro-subtotal"><span><%= formatNumber(product.item.price * product.quantity) %></span></td>
-                          
-                    
-                    
-                          </tr>
-                      <% }); %>
-                    <% } else { %>    
-                        <tr>
-                          <td colspan="8" class="actions">
-                            <p class="text-center text-danger font-weight-bold">Your cart is empty.</p>
-                          </td>
-                        </tr>
+                  <!-- Product Rows -->
+                  <% if (detailOrders && detailOrders.products && detailOrders.products.length > 0) { %>
+                    <% detailOrders.products.forEach((product, huyit) => { %>
+                      <tr>
+                        <td class="pro-remove">
+                          <%= huyit + 1 %>                    
+                        </td>
+                        <td class="pro-thumbnail">
+                          <a href="#"><img src="<%= product.item.image %>" alt="<%= product.item.title %>"/></a>
+                        </td>
+                        <td class="pro-title"><a href="#"><%= product.item.title %></a></td>
+                        <td class="pro-price"><span><%= formatNumber(product.item.price) %></span></td>
+                        <td class="pro-quantity">
+                          <div class="pro-qty">
+                            <div class="count-input-block">
+                              <input type="hidden" id="idProduct_<%= product.item._id %>" value="<%= product.item._id %>">
+                              <input
+                                type="number"
+                                id="quantity_<%= product.item._id %>"
+                                class="form-control text-center"
+                                value="<%= product.quantity %>"
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <td class="pro-subtotal"><span><%= formatNumber(product.item.price * product.quantity) %></span></td>
+                      </tr>
+                    <% }); %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="6" class="actions">
+                        <p class="text-center text-danger font-weight-bold">No products found.</p>
+                      </td>
+                    </tr>
                   <% } %>
-                  <!-- Discount Row  -->
-                 
                 </tbody>
               </table>
+              
             </div>
           </form>
         </div>

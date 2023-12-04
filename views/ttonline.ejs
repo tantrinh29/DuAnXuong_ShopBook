@@ -1,47 +1,54 @@
 <%- include('layout/header.ejs') %>
-  <%- include('layout/navbar.ejs', {categories: categories}) %>
+<%- include('layout/navbar.ejs', {categories: categories}) %>
 
-    <input type="hidden" name="paymentMethod" id="paymentMethod" value="<%= paymentMethod %>" />
-    <input type="hidden" name="vnpAmount" id="vnpAmount" value="<%= vnpAmount %>" />
-    <input type="hidden" name="vnpTransactionNo" id="vnpTransactionNo" value="<%= vnpTransactionNo %>" />
-    <input type="hidden" name="vnpBankCode" id="vnpBankCode" value="<%= vnpBankCode %>" />
-    <h1>Đơn hàng đang xử lý...</h1>
-    <script>
-      $(document).ready(function () {
-        // Thay đổi từ sự kiện click sang sự kiện load
-        $(window).on("load", function () {
-
-          $.ajax({
-            type: "POST",
-            dataType: "JSON",
-            url: "/orderCart",
-            data: {
-              type: 'orderCart',
-              paymentMethod: $("#paymentMethod").val(),
-              vnpAmount: $("#vnpAmount").val(),
-              vnpTransactionNo: $("#vnpTransactionNo").val(),
-              vnpBankCode: $("#vnpBankCode").val(),
-            },
-            success: function (res) {
-              Swal.fire({
-                icon: res.status === true ? "success" : "error",
-                title: 'Thông Báo',
-                text: res.message
-              }).then((result) => {
-                if (res.status === true) {
-                  window.location.href = "/listOrder"
-                } else {
-                  window.location.href = "/login";
-                }
-              });
-            },
-            error: function (xhr, status, error) {
-              console.error(error);
-            },
+<input type="hidden" name="paymentMethod" id="paymentMethod" value="<%= paymentMethod %>" />
+<input type="hidden" name="vnpAmount" id="vnpAmount" value="<%= vnpAmount %>" />
+<input type="hidden" name="vnpTransactionNo" id="vnpTransactionNo" value="<%= vnpTransactionNo %>" />
+<input type="hidden" name="vnpBankCode" id="vnpBankCode" value="<%= vnpBankCode %>" />
+<div id="loading-container">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+  <p>Đang xử lý đơn hàng. Vui lòng đợi...</p>
+</div>
+<script>
+  $(document).ready(function () {
+    // Thay đổi từ sự kiện click sang sự kiện load
+    $(window).on("load", function () {
+      $.ajax({
+        type: "POST",
+        dataType: "JSON",
+        url: "/orderCart",
+        data: {
+          type: 'orderCart',
+          paymentMethod: $("#paymentMethod").val(),
+          vnpAmount: $("#vnpAmount").val(),
+          vnpTransactionNo: $("#vnpTransactionNo").val(),
+          vnpBankCode: $("#vnpBankCode").val(),
+        },
+        success: function (res) {
+          Swal.fire({
+            icon: res.status === true ? "success" : "error",
+            title: 'Thông Báo',
+            text: res.message
+          }).then((result) => {
+            if (res.status === true) {
+              window.location.href = "/listOrder"
+            } else {
+              window.location.href = "/login";
+            }
           });
-        });
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        },
+        complete: function () {
+          // Remove the loading container when the AJAX call is complete
+          $("#loading-container").remove();
+        }
       });
+    });
+  });
+</script>
 
-    </script>
-
-    <%- include('layout/footer.ejs') %>
+<%- include('layout/footer.ejs') %>

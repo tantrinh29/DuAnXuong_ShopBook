@@ -175,7 +175,7 @@ exports.updateOrder = (req, res, next) => {
       .then((result) => {
           res.status(200).json({
               status: true,
-              message: "Đang giao hàng đến khác hàng",
+              message: "Đang giao hàng đến khách hàng",
           });
       })
       .catch((err) => {
