@@ -60,7 +60,7 @@ exports.orderPayment = (req, res, next) => {
     let returnUrl = config.vnp_ReturnUrl;
     let orderId = moment(date).format("DDHHmmss");
     let amount = req.body.totalPrice;
-    let bankCode = "NCB";
+    let bankCode = "";
 
     let locale = "vn";
     if (locale === null || locale === "") {

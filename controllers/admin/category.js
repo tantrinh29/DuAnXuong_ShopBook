@@ -22,8 +22,8 @@ exports.addCategory = (req, res, next) => {
     cate
       .save()
       .then((result) => {
-        const script = `<script>alert("Thêm Danh Mục Thành Công"); window.location.href = '/admin/category';</script>`;
-      res.status(200).send(script);
+        res.redirect("/admin/category");
+     
       })
       .catch((err) => {
         if (!err.statusCode) {
@@ -45,8 +45,7 @@ exports.updateCategory = (req, res, next) => {
       return huyit.save();
     })
     .then((result) => {
-      const script = `<script>alert("Sửa Danh Mục Thành Công"); window.location.href = '/admin/category';</script>`;
-      res.status(200).send(script);
+      res.redirect("/admin/category");
     })
     .catch((err) => {
       if (!err.statusCode) {
