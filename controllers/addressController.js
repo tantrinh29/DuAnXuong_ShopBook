@@ -7,7 +7,7 @@ exports.getUserAddresses = async (req, res) => {
   try {
     const categories = await Category.find({});
     const userId = req.session.userID; // Lấy User ID từ session
-    console.log("User ID from session:", userId);
+   
     const addresses = await Address.find({ user: userId });
     res.render("user-addresses", {
       addresses: addresses,
@@ -98,7 +98,7 @@ exports.editAddress = async (req, res) => {
 exports.deleteAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
-    console.log("Deleting address with ID:", addressId);
+    console.log("xóa thành công id:", addressId);
 
     await Address.findOneAndDelete({ _id: addressId });
 
