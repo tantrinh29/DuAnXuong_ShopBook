@@ -6,6 +6,27 @@
      } 
      return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,"); } 
      %>
+     <style>
+      /* Thêm CSS cho modal */
+      .modal-content {
+        color: #000; /* Màu chữ cho modal */
+      }
+    
+      .modal-body {
+        font-size: 16px; /* Kích thước chữ cho nội dung trong modal */
+      }
+    
+      #addressList li {
+        cursor: pointer;
+        padding: 8px;
+        border-bottom: 1px solid #ddd; /* Đường kẻ chia giữa các địa chỉ */
+      }
+    
+      #addressList li:hover {
+        background-color: #f0f0f0; /* Màu nền khi di chuột qua địa chỉ */
+      }
+    </style>
+    
       <section class="breadcrumb-section">
         <h2 class="sr-only">Site Breadcrumb</h2>
         <div class="container">
@@ -30,32 +51,54 @@
                   <div class="col-lg-7 mb--20">
                     <!-- Billing Address -->
                     <div id="billing-form" class="mb-40">
-                      <h4 class="checkout-title">Billing Address</h4>
+                      <h4 class="checkout-title">Địa chỉ thanh toán</h4>
                       <div class="row">
                         <div class="col-md-6 col-12 mb--20">
-                          <label>Full Name*</label>
+                          <label>Họ và tên *</label>
                           <input type="text" id="fullname" value="<%= userOrder.fullname %>" placeholder="Full Name" />
                         </div>
 
                         <div class="col-md-6 col-12 mb--20">
-                          <label>Email Address*</label>
+                          <label>Địa chỉ Email *</label>
                           <input type="email" id="email" value="<%= locals.email %>" placeholder="Email Address" />
                         </div>
                         <div class="col-md-6 col-12 mb--20">
-                          <label>Phone*</label>
-                          <input type="text" id="phone" placeholder="Phone number" />
+                          <label>Số điện thoại *</label>
+                          <input type="text" id="phone" placeholder="Số điện thoại" />
                         </div>
                         <div class="col-md-6 col-12 mb--20">
-                          <label>Address*</label>
-                          <input type="text" id="address" placeholder="Address " />
+                          <label>Địa chỉ *</label>
+                          <div class="input-group">
+                            <input type="text" id="address" placeholder="Địa chỉ" disabled />
+                            <div class="input-group-append">
+                              <button class="btn btn-outline-secondary" type="button" onclick="openAddressModal()">Chọn Địa Chỉ</button>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Modal -->
+                        <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Danh sách địa chỉ</h5>
+       
+                              </div>
+                              <div class="modal-body">
+                                <ul id="addressList"></ul>
+                              </div>
+      
+                                <button class="btn btn-outline" type="button" onclick="addAddress()"><a href="/addresses">Thêm Địa Chỉ Mới</a></button>
+      
+                            </div>
+                          </div>
                         </div>
 
-                        
+
                       </div>
                     </div>
 
                     <div class="order-note-block mt--5">
-                      <label for="order-note">Order notes</label>
+                      <label for="order-note">Ghi chú</label>
                       <textarea id="comment" cols="30" rows="10" class="order-note"
                         placeholder="Nhập Vấn Đề"></textarea>
                     </div>
@@ -65,8 +108,8 @@
                       <!-- Cart Total -->
                       <div class="col-12">
                         <div class="checkout-cart-total">
-                          <h2 class="checkout-title">YOUR ORDER</h2>
-                          <h4>Product <span>Total</span></h4>
+                          <h2 class="checkout-title">Đơn hàng của bạn</h2>
+                          <h4>Sản phẩm <span>Tổng</span></h4>
                           <ul>
                             <% if(products.length===0) { %>
                               <p class="text-center text-danger font-weight-bold">Your cart is empty.</p>
@@ -83,11 +126,11 @@
                                   <% }) %>
                                     <% } %>
                           </ul>
-                          <p>Sub Total <span>
+                          <p>Tổng đơn hàng <span>
                               <%= products.length !==0 ? formatNumber(totalPrice) : 0 %> VNĐ
                             </span></p>
                           <input type="hidden" name="totalPrice" id="totalPrice" value="<%= totalPrice %>" />
-                          <p>Shipping Fee <span>0 VNĐ</span></p>
+                          <p>Phí vận chuyển<span>0 VNĐ</span></p>
 
                           <br>
                           <div>
@@ -111,7 +154,7 @@
 
                         </div>
                         <div class="term-block">
-                          <button id="addOrderCart" class="place-order w-100">Place order</button>
+                          <button id="addOrderCart" class="place-order w-100">Đặt hàng</button>
 
 
                         </div>
@@ -151,4 +194,46 @@
         });
 
       </script>
+      <script>
+        async function openAddressModal() {
+    try {
+      // Gọi API để lấy danh sách địa chỉ
+      const response = await fetch('/api/user-addresses');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const addresses = await response.json();
+
+      // Cập nhật modal với danh sách địa chỉ
+      updateAddressModal(addresses);
+
+      // Hiển thị modal
+      $('#addressModal').modal('show');
+    } catch (error) {
+      console.error('Error fetching user addresses:', error);
+    }
+  }
+
+      
+        function updateAddressModal(addresses) {
+          const addressList = document.getElementById('addressList');
+          addressList.innerHTML = '';
+      
+          addresses.forEach(address => {
+            const li = document.createElement('li');
+            li.textContent = `${address.street}, ${address.city}, ${address.country}`;
+            li.onclick = function() {
+              selectAddress(address);
+              $('#addressModal').modal('hide');
+            };
+            addressList.appendChild(li);
+          });
+        }
+      
+        function selectAddress(address) {
+          document.getElementById('address').value = `${address.street}, ${address.city}, ${address.country}`;
+        }
+      </script>
+      
       <%- include('layout/footer.ejs') %>

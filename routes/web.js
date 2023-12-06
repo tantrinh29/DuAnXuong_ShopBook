@@ -4,6 +4,7 @@ const userController = require("../controllers/auth");
 const indexController = require("../controllers/index");
 const Category = require("../models/category");
 const vnpayController = require("../controllers/vnpayControllers");
+const addressController = require('../controllers/addressController');
 
 // check login
 function checkLoggedIn(req, res, next) {
@@ -24,6 +25,23 @@ router.post("/updateCart", indexController.updateCart);
 router.post("/deleteCart", indexController.deleteCart);
 router.get("/checkout", checkLoggedIn, indexController.getviewCheckOut);
 router.post("/orderCart", indexController.orderCart);
+
+// Route để hiển thị trang quản lý địa chỉ
+router.get('/addresses', addressController.getAddressesPage);
+
+// Route để xử lý việc thêm mới địa chỉ
+router.post('/addresses', addressController.addAddress);
+
+router.get('/user-addresses', addressController.getUserAddresses);
+
+// Route để hiển thị trang sửa địa chỉ
+router.get("/edit-address/:id", addressController.getEditAddressPage);
+
+// Route để xử lý cập nhật địa chỉ sau khi sửa
+router.post("/edit-address/:id", addressController.editAddress);
+
+// Route để xử lý xóa địa chỉ
+router.delete("/addresses/:id", addressController.deleteAddress);
 
 router.get("/listOrder", checkLoggedIn, indexController.getListOrder);
 router.get(

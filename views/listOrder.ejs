@@ -23,7 +23,7 @@
         <div class="cart_area cart-area-padding">
           <div class="container">
             <div class="page-section-title">
-              <h1>List Cart</h1>
+              <h1>List Order</h1>
             </div>
             <div class="row">
               <div class="col-12">
@@ -106,41 +106,42 @@
       </main>
       <!-- Thêm SweetAlert và Ajax vào trang của bạn (trong thẻ head hoặc trước thẻ đóng body) -->
       <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script>
-  function markOrderReceived(orderId) {
-    $.ajax({
-      url: `/statusOrder/${orderId}`,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
-        // Hiển thị thông báo
-        const notificationDiv = $('#notification');
-        notificationDiv.html(`<p>${data.message}</p>`);
-
-        // Thực hiện cập nhật giao diện người dùng
-        updateOrderUI(data.order);
-
-        // Hiển thị cảnh báo khi nhận hàng thành công
-        alert(data.message);
-
-        // Tự động làm mới trang sau một khoảng thời gian (ví dụ: 1 giây)
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
-      },
-      error: function(error) {
-        console.error('Lỗi đánh dấu đơn hàng đã nhận:', error);
-      }
-    });
-  }
-
-  // Hàm cập nhật giao diện người dùng sau khi nhận thông báo
-  function updateOrderUI(updatedOrder) {
-    // Thực hiện logic cập nhật giao diện người dùng dựa trên dữ liệu mới
-    // Ví dụ: hiển thị trạng thái mới, cập nhật bảng dữ liệu, v.v.
-    console.log('Đã cập nhật giao diện người dùng:', updatedOrder);
-  }
-</script>
+      <script>
+        function markOrderReceived(orderId) {
+          $.ajax({
+            url: `/statusOrder/${orderId}`,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+              // Hiển thị thông báo với SweetAlert2
+              Swal.fire({
+                icon: data.status === true ? 'success' : 'error',
+                title: 'Thông báo',
+                text: data.message,
+                confirmButtonText: 'OK'
+              }).then((result) => {
+                
+                setTimeout(() => {
+                  location.reload();
+                }, 1000);
+              });
+      
+              // Thực hiện cập nhật giao diện người dùng
+              updateOrderUI(data.order);
+            },
+            error: function(error) {
+              console.error('Lỗi đánh dấu đơn hàng đã nhận:', error);
+            }
+          });
+        }
+      
+        // Hàm cập nhật giao diện người dùng sau khi nhận thông báo
+        function updateOrderUI(updatedOrder) {
+          
+          console.log('Đã cập nhật giao diện người dùng:', updatedOrder);
+        }
+      </script>
+      
 
       <!-- Cart Page End -->
       <%- include('layout/footer.ejs') %>
