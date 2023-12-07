@@ -3,6 +3,7 @@ const random = require("random-token");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const Category = require("../models/category");
 
 exports.createUser = (req, res, next) => {
   const { fullname, password, repassword, email } = req.body;
@@ -183,8 +184,9 @@ exports.postForgotPassword = (req, res, next) => {
 };
 
 
-exports.getResetPassword = (req, res, next) => {
+exports.getResetPassword = async (req, res, next) => {
   const resetToken = req.params.resetToken;
+  const categories = await Category.find({});
 
   // Kiểm tra tính hợp lệ của mã xác nhận
   User.findOne({
@@ -199,7 +201,7 @@ exports.getResetPassword = (req, res, next) => {
       }
 
       // Hiển thị trang để người dùng nhập mật khẩu mới
-      res.render("auth/reset-password", { resetToken: resetToken });
+      res.render("auth/reset-password", { resetToken: resetToken, categories: categories });
     })
     .catch((err) => {
       res.status(500).json({ status: false, message: "Có lỗi xảy ra" });
