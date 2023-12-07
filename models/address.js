@@ -19,10 +19,6 @@ const addressSchema = new Schema({
     type: String,
     required: true,
   },
-  country: {
-    type: String,
-    required: true,
-  },
   // Thêm trường UserID để liên kết với người dùng
   user: {
     type: Schema.Types.ObjectId,

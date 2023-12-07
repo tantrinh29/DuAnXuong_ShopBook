@@ -55,7 +55,7 @@
   <h3>Sửa địa chỉ</h3>
 
   <!-- Biểu mẫu sửa địa chỉ -->
-  <form action="/edit-address/<%= address._id %>" method="post">
+  <form id="editAddressForm" action="/edit-address/<%= address._id %>" method="post">
     <label for="street">Địa chỉ giao hàng:</label>
     <input type="text" name="street" value="<%= address.street %>" required>
 
@@ -68,8 +68,7 @@
     <label for="city">Thành phố:</label>
     <input type="text" name="city" value="<%= address.city %>" required>
 
-    <label for="country">Quốc gia:</label>
-    <input type="text" name="country" value="<%= address.country %>" required>
+    
 
     <button type="submit">Cập nhật địa chỉ</button>
   </form>
@@ -79,5 +78,59 @@
 
   <!-- Danh sách địa chỉ -->
 </body>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const editAddressForm = document.getElementById("editAddressForm");
+
+    editAddressForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      try {
+        const response = await fetch("/edit-address/<%= address._id %>", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            street: editAddressForm.street.value,
+            commune: editAddressForm.commune.value,
+            district: editAddressForm.district.value,
+            city: editAddressForm.city.value,
+            
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Thành công!",
+            text: data.message,
+          }).then(() => {
+            // Redirect to user-addresses page upon success
+            window.location.href = "/user-addresses";
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Lỗi!",
+            text: data.message || "Có lỗi khi cập nhật địa chỉ",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi!",
+          text: "Đã xảy ra lỗi khi xử lý yêu cầu của bạn",
+        });
+      }
+    });
+  });
+</script>
+
 
 <%- include('layout/footer.ejs') %>

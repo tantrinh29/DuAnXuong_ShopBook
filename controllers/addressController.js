@@ -34,7 +34,7 @@ exports.getAddressesPage = async (req, res) => {
 exports.addAddress = async (req, res) => {
   try {
     // Lấy thông tin địa chỉ và User ID từ body của request
-    const { street,commune,district, city, country } = req.body;
+    const { street, commune, district, city } = req.body;
     const userId = req.session.userID;
 
     // Tạo đối tượng địa chỉ
@@ -43,19 +43,20 @@ exports.addAddress = async (req, res) => {
       commune,
       district,
       city,
-      country,
       user: userId, // Liên kết địa chỉ với User ID
     });
 
     // Lưu địa chỉ vào cơ sở dữ liệu
     await newAddress.save();
 
-    res.redirect("/addresses"); // Chuyển hướng về trang quản lý địa chỉ
+    // Gửi thông báo JSON về máy khách
+    res.status(200).json({ message: "Địa chỉ đã được thêm thành công" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Lỗi Nội Server" });
   }
 };
+
 exports.getEditAddressPage = async (req, res) => {
   try {
     const addressId = req.params.id;
@@ -77,36 +78,41 @@ exports.getEditAddressPage = async (req, res) => {
 exports.editAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
-    const { street,commune,district, city, country } = req.body;
+    const { street, commune, district, city} = req.body;
 
+    // Update the address in the database
     await Address.findByIdAndUpdate(addressId, {
       street,
       commune,
       district,
       city,
-      country,
+      
     });
 
-    res.redirect('/user-addresses'); // Chuyển hướng sau khi cập nhật thành công
+    // Send a JSON response indicating success
+    res.status(200).json({ success: true, message: "Cập nhật địa chỉ thành công" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
 
 // Trong phương thức xóa địa chỉ
 exports.deleteAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
-    console.log("xóa thành công id:", addressId);
 
+    // Thực hiện xóa trong cơ sở dữ liệu
     await Address.findOneAndDelete({ _id: addressId });
 
-    res.redirect("/addresses");
+    // Gửi phản hồi JSON cho biết thành công
+    res.status(200).json({ success: true, message: "Xóa địa chỉ thành công" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ success: false, message: "Lỗi Nội bộ của máy chủ" });
   }
 };
+
 
 

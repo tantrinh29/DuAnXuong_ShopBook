@@ -69,26 +69,23 @@
                         <div class="col-md-6 col-12 mb--20">
                           <label>Địa chỉ *</label>
                           <div class="input-group">
-                            <input type="text" id="address" placeholder="Địa chỉ" disabled />
-                            <div class="input-group-append">
+                            <textarea style="width: 400px; border-radius: 5px;  height: 50px;" id="address" placeholder="ㅤĐịa chỉ" disabled></textarea>
+                            <div class="input-group-append" style="margin-top: 20px;">
                               <button class="btn btn-outline-secondary" type="button" onclick="openAddressModal()">Chọn Địa Chỉ</button>
                             </div>
                           </div>
                         </div>
                         <!-- Modal -->
                         <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                          <div class="modal-dialog" role="document">
-                            <div class="modal-content">
+                          <div class="modal-dialog" role="document" style="margin-right: 650px;">
+                            <div class="modal-content" style="background-color: rgb(241, 241, 241); width: 830px;">
                               <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Danh sách địa chỉ</h5>
-       
+                                <h5 class="modal-title" id="exampleModalLabel">Danh sách địa chỉ giao hàng</h5>
                               </div>
-                              <div class="modal-body">
-                                <ul id="addressList"></ul>
-                              </div>
-      
+                              <div class="modal-body" id="addressDetails"></div>
+                              <div class="modal-footer">
                                 <button class="btn btn-outline" type="button" onclick="addAddress()"><a href="/addresses">Thêm Địa Chỉ Mới</a></button>
-      
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -167,6 +164,7 @@
           </div>
         </div>
       </main>
+      <hr>
       <script>
         // Gửi Data
         $("#addOrderCart").on("click", function () {
@@ -194,46 +192,67 @@
         });
 
       </script>
-      <script>
-        async function openAddressModal() {
-    try {
-      // Gọi API để lấy danh sách địa chỉ
-      const response = await fetch('/api/user-addresses');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+     <script>
+      async function openAddressModal() {
+        try {
+          // Gọi API để lấy danh sách địa chỉ
+          const response = await fetch('/api/user-addresses');
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+    
+          const addresses = await response.json();
+    
+          // Cập nhật modal với danh sách địa chỉ
+          updateAddressModal(addresses);
+    
+          // Hiển thị modal
+          $('#addressModal').modal('show');
+        } catch (error) {
+          console.error('Error fetching user addresses:', error);
+        }
       }
+    
+      function updateAddressModal(addresses) {
+        const addressDetails = document.getElementById('addressDetails');
+        addressDetails.innerHTML = '';
+    
+        addresses.forEach(address => {
+          const addressContainer = document.createElement('div');
+          addressContainer.className = 'address-container';
+          addressContainer.style = "border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 8px; width: 250px; height:170px; display: inline-block; margin-right: 15px; margin-bottom: 15px; cursor: pointer;";
+          
+          const addressContent = document.createElement('div');
+          addressContent.innerHTML = `
+            <h6><strong>Địa chỉ:</strong> ${address.street}</h6>
+            <p><strong>Phường/Xã:</strong> ${address.commune}</p>
+            <p><strong>Quận/Huyện:</strong> ${address.district}</p>
+            <p><strong>Tỉnh/Thành phố:</strong> ${address.city}</p>
+          `;
+    
+          addressContainer.appendChild(addressContent);
 
-      const addresses = await response.json();
+          addressContainer.addEventListener('mouseenter', function () {
+      addressContainer.style.backgroundColor = '#CDC9C9'; // Đổi màu khi rê chuột vào
+    });
 
-      // Cập nhật modal với danh sách địa chỉ
-      updateAddressModal(addresses);
+    addressContainer.addEventListener('mouseleave', function () {
+      addressContainer.style.backgroundColor = ''; // Xóa màu khi chuột rời đi
+    });
 
-      // Hiển thị modal
-      $('#addressModal').modal('show');
-    } catch (error) {
-      console.error('Error fetching user addresses:', error);
-    }
-  }
-
-      
-        function updateAddressModal(addresses) {
-          const addressList = document.getElementById('addressList');
-          addressList.innerHTML = '';
-      
-          addresses.forEach(address => {
-            const li = document.createElement('li');
-            li.textContent = `${address.street}, ${address.city}, ${address.country}`;
-            li.onclick = function() {
-              selectAddress(address);
-              $('#addressModal').modal('hide');
-            };
-            addressList.appendChild(li);
-          });
-        }
-      
-        function selectAddress(address) {
-          document.getElementById('address').value = `${address.street}, ${address.city}, ${address.country}`;
-        }
-      </script>
+    
+          addressContainer.onclick = function () {
+            selectAddress(address);
+            $('#addressModal').modal('hide');
+          };
+    
+          addressDetails.appendChild(addressContainer);
+        });
+      }
+    
+      function selectAddress(address) {
+        document.getElementById('address').value = `${address.street}, ${address.commune}, ${address.district}, ${address.city}`;
+      }
+    </script>
       
       <%- include('layout/footer.ejs') %>
