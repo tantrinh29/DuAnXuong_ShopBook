@@ -77,10 +77,10 @@
                         </div>
                         <!-- Modal -->
                         <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                          <div class="modal-dialog" role="document" style="margin-right: 650px;">
-                            <div class="modal-content" style="background-color: rgb(241, 241, 241); width: 830px;">
+                          <div class="modal-dialog" role="document" style="margin-right: 750px;">
+                            <div class="modal-content" style="background-color: rgb(241, 241, 241); width: 980px; ">
                               <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Danh sách địa chỉ giao h</h5>
+                                <h5 class="modal-title" id="exampleModalLabel">Chọn địa chỉ giao hàng</h5>
                               </div>
                               <div class="modal-body" id="addressDetails"></div>
                               <div class="modal-footer">
@@ -245,7 +245,7 @@ $("#addOrderCart").on("click", function () {
         addresses.forEach(address => {
           const addressContainer = document.createElement('div');
           addressContainer.className = 'address-container';
-          addressContainer.style = "border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 8px; width: 250px; height:170px; display: inline-block; margin-right: 15px; margin-bottom: 15px; cursor: pointer;";
+          addressContainer.style = "border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 8px; width: 300px; height:170px; display: inline-block; margin-right: 15px; margin-bottom: 15px; cursor: pointer;";
           
           const addressContent = document.createElement('div');
           addressContent.innerHTML = `

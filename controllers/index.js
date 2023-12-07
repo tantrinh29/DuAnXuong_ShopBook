@@ -40,7 +40,6 @@ exports.getDetail = async (req, res) => {
 };
 
 // get slug category
-
 exports.getProductOfCategory = async (req, res) => {
   try {
     const slugCate = req.params.slug;
@@ -61,7 +60,6 @@ exports.getProductOfCategory = async (req, res) => {
 };
 
 // post comment
-
 exports.postComment = async (req, res) => {
   if (!req.session.loggedin) {
     return res
@@ -107,7 +105,6 @@ exports.postComment = async (req, res) => {
 };
 
 // update comment
-
 exports.updateComment = (req, res, next) => {
   if (!req.session.loggedin) {
     return res.status(200).json({
@@ -151,7 +148,6 @@ exports.updateComment = (req, res, next) => {
 };
 
 // delete comment
-
 exports.deleteComment = (req, res) => {
   if (!req.session.loggedin) {
     return res.status(200).json({
@@ -189,7 +185,6 @@ exports.deleteComment = (req, res) => {
 };
 
 // add to cart
-
 exports.addToCart = async (req, res) => {
   try {
     const slug = req.body.slugProduct;
@@ -397,7 +392,6 @@ exports.deleteCart = async (req, res) => {
 };
 
 // show view
-
 exports.getviewCheckOut = async (req, res) => {
   try {
     const categories = await Category.find({});
@@ -454,7 +448,6 @@ exports.getviewCheckOut = async (req, res) => {
 };
 
 // odder
-
 const createVnpayPayment = async (orderData) => {
   try {
     const result = await VnPayModel.create({
@@ -550,7 +543,6 @@ exports.orderCart = async (req, res) => {
     });
   }
 };
-
 
 // list order
 exports.getListOrder = async (req, res) => {

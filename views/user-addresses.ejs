@@ -37,7 +37,7 @@
   </div>
   <% addresses.forEach(address => { %>
     <div class="address-container" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 8px; width: 350px; display: inline-block; margin-right: 15px; margin-bottom: 15px; cursor: pointer;">
-      <h6><strong>Địa chỉ:</strong> <%= address.street %></h6>
+      <p style="margin-bottom: 3px;"><strong>Địa chỉ:</strong> <%= address.street %></p>
       <p style="margin-bottom: 3px;"><strong>Phường/Xã:</strong> <%= address.commune %></p>
       <p style="margin-bottom: 3px;"><strong>Quận/Huyện:</strong> <%= address.district %></p>
       <p style="margin-bottom: 3px;"><strong>Tỉnh/Thành phố:</strong> <%= address.city %></p>

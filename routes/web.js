@@ -31,7 +31,6 @@ router.get('/addresses', addressController.getAddressesPage);
 
 // Route để xử lý việc thêm mới địa chỉ
 router.post('/addresses', addressController.addAddress);
-
 router.get('/user-addresses', addressController.getUserAddresses);
 
 // Route để hiển thị trang sửa địa chỉ
