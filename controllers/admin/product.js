@@ -2,10 +2,7 @@ const slug = require("url-slug");
 const Product = require("../../models/product");
 const Category = require("../../models/category");
 const Comment = require("../../models/comment");
-// //////////////////////////////////////////
-
 const path = require("path");
-////////////////////////////////////////////
 
 exports.listProduct = async (req, res, next) => {
   try {
