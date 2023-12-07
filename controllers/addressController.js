@@ -18,6 +18,7 @@ exports.getUserAddresses = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 exports.getAddressesPage = async (req, res) => {
   try {
     const categories = await Category.find({});
@@ -96,8 +97,6 @@ exports.editAddress = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
-
-
 // Trong phương thức xóa địa chỉ
 exports.deleteAddress = async (req, res) => {
   try {
