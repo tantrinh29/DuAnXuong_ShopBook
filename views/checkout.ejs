@@ -80,7 +80,7 @@
                           <div class="modal-dialog" role="document" style="margin-right: 650px;">
                             <div class="modal-content" style="background-color: rgb(241, 241, 241); width: 830px;">
                               <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Danh sách địa chỉ giao hàng</h5>
+                                <h5 class="modal-title" id="exampleModalLabel">Danh sách địa chỉ giao h</h5>
                               </div>
                               <div class="modal-body" id="addressDetails"></div>
                               <div class="modal-footer">
@@ -167,29 +167,54 @@
       <hr>
       <script>
         // Gửi Data
-        $("#addOrderCart").on("click", function () {
-          $.ajax({
-            type: "POST",
-            dataType: "JSON",
-            url: `/orderPayment/${$("input[name='paymentMethod']:checked").val()}`,
-            data: {
-              type: 'orderCart',
-              fullname: $("#fullname").val(),
-              email: $("#email").val(),
-              phone: $("#phone").val(),
-              address: $("#address").val(),
-              comment: $("#comment").val(),
-              totalPrice: $("#totalPrice").val(),
-              paymentMethod: $("input[name='paymentMethod']:checked").val(),
-            },
-            success: function (res) {
+$("#addOrderCart").on("click", function () {
+  // Kiểm tra xem các trường bắt buộc đã được nhập chưa
+  const fullname = $("#fullname").val();
+  const email = $("#email").val();
+  const phone = $("#phone").val();
+  const address = $("#address").val();
+  const comment = $("#comment").val();
+
+  if (!fullname || !email || !phone || !address || !comment) {
+    // Sử dụng SweetAlert để hiển thị thông báo lỗi
+    Swal.fire({
+      icon: 'error',
+      title: 'Lỗi',
+      text: 'Vui lòng nhập đầy đủ thông tin.',
+    });
+    return;
+  }
+
+  // Nếu tất cả các trường đã được nhập, tiến hành gửi dữ liệu đặt hàng
+  $.ajax({
+    type: "POST",
+    dataType: "JSON",
+    url: `/orderPayment/${$("input[name='paymentMethod']:checked").val()}`,
+    data: {
+      type: 'orderCart',
+      fullname: fullname,
+      email: email,
+      phone: phone,
+      address: address,
+      comment: $("#comment").val(),
+      totalPrice: $("#totalPrice").val(),
+      paymentMethod: $("input[name='paymentMethod']:checked").val(),
+    },
+    success: function (res) {
               window.location.href = res.vnpUrl;
             },
-            error: function (xhr, status, error) {
-              console.error(error);
-            },
-          });
-        });
+    error: function (xhr, status, error) {
+      console.error(error);
+      // Sử dụng SweetAlert để hiển thị thông báo lỗi
+      Swal.fire({
+        icon: 'error',
+        title: 'Lỗi',
+        text: 'Đã xảy ra lỗi khi xử lý đơn hàng.',
+      });
+    },
+  });
+});
+
 
       </script>
      <script>
