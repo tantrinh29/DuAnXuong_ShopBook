@@ -1,6 +1,7 @@
 const Order = require("../../models/order");
 const Product = require("../../models/product");
 const Users = require("../../models/user");
+
 exports.getAdmin = async (req, res) => {
     function formatNumber(num) {
         if (num == null) {
