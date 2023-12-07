@@ -61,8 +61,7 @@ exports.deleteCategory = (req, res, next) => {
     .then((post) => {
       if (post.deletedCount > 0) {
         // Include a script in the response to show an alert
-        const script = `<script>alert("Xóa Danh Mục Thành Công"); window.location.href = '/admin/category';</script>`;
-        res.status(200).send(script);
+        res.redirect("/admin/category");
       } else {
         const error = new Error("Không tìm thấy Danh mục này");
         error.statusCode = 404;
