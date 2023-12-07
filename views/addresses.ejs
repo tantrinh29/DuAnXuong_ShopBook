@@ -68,10 +68,10 @@
     </div>
   </section>
 
-  <h3>Thêm địa chỉ mới</h3>
+  
 
   <!-- Biểu mẫu thêm mới địa chỉ -->
-  <form action="/addresses" method="post">
+  <form id="addAddressForm" action="/addresses" method="post">
     <label for="street">Địa chỉ giao hàng:</label>
     <input type="text" name="street" required>
 
@@ -84,14 +84,11 @@
     <label for="city">Thành phố/Tỉnh:</label>
     <input type="text" name="city" required>
 
-    <label for="country">Quốc gia:</label>
-    <input type="text" name="country" required>
 
     <!-- UserID của người dùng, bạn có thể lấy thông qua đăng nhập hoặc cách khác -->
     <input type="hidden" name="userId" value="5fecb88f5e485a2c102c9a6d">
 
-    <button type="submit">Add Address</button>
-    <button style="margin-left: 250px;" ><a href="user-addresses">Danh sách địa chỉ của bạn</a></button>
+    <button type="submit">Thêm địa chỉ </button>
   </form>
 <br>
   
@@ -99,5 +96,60 @@
 
   <!-- Danh sách địa chỉ -->
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const addAddressForm = document.getElementById("addAddressForm");
+
+    addAddressForm.addEventListener("submit", async function (event) {
+      event.preventDefault(); // Ngăn chặn sự kiện gửi form mặc định
+
+      try {
+        const response = await fetch("/addresses", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            street: addAddressForm.street.value,
+            commune: addAddressForm.commune.value,
+            district: addAddressForm.district.value,
+            city: addAddressForm.city.value,
+            
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Hiển thị swal khi địa chỉ được thêm thành công
+          Swal.fire({
+            icon: "success",
+            title: "Thành công!",
+            text: data.message,
+          }).then(() => {
+            // Chuyển hướng đến trang user-addresses sau khi swal đóng
+            window.location.href = "/user-addresses";
+          });
+        } else {
+          // Hiển thị swal khi có lỗi từ phía máy chủ
+          Swal.fire({
+            icon: "error",
+            title: "Lỗi!",
+            text: data.message || "Có lỗi khi thêm địa chỉ",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        // Hiển thị swal khi có lỗi xử lý yêu cầu
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi!",
+          text: "Đã xảy ra lỗi khi xử lý yêu cầu của bạn",
+        });
+      }
+    });
+  });
+</script>
+
 
 <%- include('layout/footer.ejs') %>

@@ -2,25 +2,10 @@
 <%- include('layout/navbar.ejs', {categories: categories}) %>
 <style>
 .container {
-    margin-left: 300px;
-    margin-top: 40px;
+    margin-left: 230px;
   }
 
-  .address-table {
-    width: 80%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-
-  .address-table th, .address-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-
-  .address-table th {
-    background-color: #f2f2f2;
-  }
+ 
 
   .button-container {
     margin-top: 20px;
@@ -50,66 +35,81 @@
   <div class="page-section-title">
     <h3>Danh sách địa chỉ</h3>
   </div>
-  <table class="address-table">
-    <thead>
-      <tr>
-        <th>Địa chỉ</th>
-        <th>Phường/Xã</th>
-        <th>Quận/Huyện</th>
-        <th>Tỉnh/Thành phố</th>
-        <th>Quốc gia</th>
-        <th>Hành động</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% addresses.forEach(address => { %>
-        <tr>
-          <td><%= address.street %></td>
-          <td><%= address.commune %></td>
-          <td><%= address.district %></td>
-          <td><%= address.city %></td>
-          <td><%= address.country %></td>
-          <td>
-            <a href="/edit-address/<%= address._id %>">
-                <button style="background-color: aquamarine; margin-left: 10px; width: 50px; border-radius: 10px;">Sửa</button>
-            </a>
-            <button style="background-color: greenyellow; margin-left: 10px; width: 50px; border-radius: 10px;" onclick="deleteAddress('<%= address._id %>')">Xóa</button>
-
-        </td>
-        </tr>
-      <% }); %>
-    </tbody>
-  </table>
+  <% addresses.forEach(address => { %>
+    <div class="address-container" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 8px; width: 350px; display: inline-block; margin-right: 15px; margin-bottom: 15px; cursor: pointer;">
+      <h6><strong>Địa chỉ:</strong><%= address.street %></h6>
+      <p><strong>Phường/Xã:</strong> <%= address.commune %></p>
+      <p><strong>Quận/Huyện:</strong> <%= address.district %></p>
+      <p><strong>Tỉnh/Thành phố:</strong> <%= address.city %></p>
+      
+      
+      <div style="margin-top: 10px;">
+        <a href="/edit-address/<%= address._id %>">
+          <button style="background-color: #62ab00; width: 50px; border-radius: 10px; color: #fff;">Sửa</button>
+        </a>
+        <button style="background-color: rgb(234, 71, 71); margin-left: 10px; width: 50px; border-radius: 10px; color: #fff;" onclick="deleteAddress('<%= address._id %>')">Xóa</button>
+      </div>
+    </div>
+  <% }); %>
+  
   <div>
-    <button style="background-color: greenyellow; margin-top: 10px; width: 100px; height: 50px; border-radius: 10px;" onclick="addAddress()"><a href="/addresses">Thêm Địa Chỉ Mới</a></button>
+    <a href="/addresses"><button style="background-color: rgb(47, 150, 12); margin-top: 15px; width: 150px; height: 60px; border-radius: 10px; color: #fff;" onclick="addAddress()"> Thêm Địa Chỉ Mới</button></a>
   </div>
 </div>
+<hr>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="/js/userAddresses.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    async function deleteAddress(addressId) {
-      try {
-        const response = await fetch(`/addresses/${addressId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-  
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+  async function deleteAddress(addressId) {
+    // Hiển thị hộp thoại xác nhận trước khi thực hiện xóa
+    Swal.fire({
+      title: 'Bạn chắc chắn muốn xóa địa chỉ?',
+      text: 'Hành động này không thể hoàn tác!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Xóa',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/addresses/${addressId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+
+          // Hiển thị thông báo SweetAlert khi xóa thành công
+          Swal.fire({
+            icon: 'success',
+            title: 'Thành công!',
+            text: 'Địa chỉ đã được xóa thành công.',
+          }).then(() => {
+            // Sau khi xóa, có thể cần làm mới trang hoặc cập nhật danh sách địa chỉ
+            window.location.reload();
+          });
+        } catch (error) {
+          console.error('Error deleting address:', error);
+
+          // Hiển thị thông báo SweetAlert khi xóa gặp lỗi
+          Swal.fire({
+            icon: 'error',
+            title: 'Lỗi!',
+            text: 'Đã xảy ra lỗi khi xóa địa chỉ.',
+          });
         }
-  
-        // Nếu muốn xử lý thêm các thay đổi sau khi xóa, bạn có thể thực hiện ở đây
-  
-        // Sau khi xóa, có thể cần làm mới trang hoặc cập nhật danh sách địa chỉ
-        window.location.reload();
-      } catch (error) {
-        console.error('Error deleting address:', error);
       }
-    }
-  </script>
-  
+    });
+  }
+</script>
 
 <%- include('layout/footer.ejs') %>
